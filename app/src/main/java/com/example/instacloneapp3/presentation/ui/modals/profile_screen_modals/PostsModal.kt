@@ -2,6 +2,7 @@ package com.example.instacloneapp3.presentation.ui.modals.profile_screen_modals
 
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -29,17 +30,73 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostItem
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
+import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostFooter
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostHeader
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserCaption
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserComment
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+
+@Composable
+fun PostItem(
+    post: Posts,
+    showModal: MutableState<Boolean>,
+    currentModalSheet: MutableState<ModalSheets>,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+
+            }
+
+    ){
+
+        PostHeader(
+            post.profile_picture,
+            post.user_name,
+            modifier = Modifier.fillMaxWidth(),
+            currentBottomSheet,
+            showBottomSheet
+        )
+        Box(){
+            Image(
+                contentScale = ContentScale.Crop,
+                painter = painterResource(id = post.imageRes),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(450.dp)
+
+            )
+        }
+        Column(modifier = Modifier.padding(10.dp)){
+            PostFooter(
+                currentBottomSheet,
+                showBottomSheet
+            )
+            UserCaption(username = post.user_name, caption = post.caption)
+            UserComment(showModal, currentModalSheet)
+        }
+        Divider()
+
+
+    }
+}
 
 @Composable
 fun PostsModalHeader(showModal: MutableState<Boolean>) {
@@ -70,7 +127,10 @@ fun PostsModalHeader(showModal: MutableState<Boolean>) {
 @Composable
 fun PostsModal(
     showModal: MutableState<Boolean>,
-    modalStartScrollIndex: MutableState<Int>
+    modalStartScrollIndex: MutableState<Int>,
+    currentModalSheet: MutableState<ModalSheets>,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>
 ) {
     val list1 = PostsRepo().getPosts()
     val posts = list1 + list1 + list1
@@ -122,7 +182,13 @@ fun PostsModal(
             state = listState
         ){
             items(posts){post ->
-                PostItem(post = post, showModal)
+                PostItem(
+                    post = post,
+                    showModal,
+                    currentModalSheet,
+                    currentBottomSheet,
+                    showBottomSheet,
+                )
             }
         }
     }
@@ -136,6 +202,9 @@ fun PostsModalPreview(){
         PostsModal(
             remember{ mutableStateOf(false)},
             remember{ mutableStateOf(0)},
+            remember{ mutableStateOf(ModalSheets.NO_SHEET)},
+            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
+            remember{ mutableStateOf(false)}
         )
     }
 }

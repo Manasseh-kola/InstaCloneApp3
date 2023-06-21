@@ -5,6 +5,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bootom_sheets.PostItemMore
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bootom_sheets.ShareContent
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets.CreateNewContent
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets.manage_account.ManageUserAccount
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets.try_new_account.TryNewAccount
@@ -13,7 +15,9 @@ enum class BottomSheets {
     NO_SHEET,
     TRY_NEW_ACCOUNT,
     CREATE_NEW_CONTENT,
-    MANAGE_USER_ACCOUNT
+    MANAGE_USER_ACCOUNT,
+    POST_ITEM_MORE,
+    SHARE_CONTENT
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +36,8 @@ fun AppBottomSheets(
             BottomSheets.TRY_NEW_ACCOUNT -> TryNewAccount()
             BottomSheets.CREATE_NEW_CONTENT -> CreateNewContent()
             BottomSheets.MANAGE_USER_ACCOUNT -> ManageUserAccount()
+            BottomSheets.POST_ITEM_MORE -> PostItemMore()
+            BottomSheets.SHARE_CONTENT -> ShareContent()
         }
     }
 }

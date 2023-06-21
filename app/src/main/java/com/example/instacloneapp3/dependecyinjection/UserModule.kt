@@ -2,6 +2,8 @@ package com.example.instacloneapp3.dependecyinjection
 
 import android.app.Application
 import androidx.activity.viewModels
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.room.Room
 import com.example.instacloneapp3.core.util.EnvironmentalVariables
 import com.example.instacloneapp3.data.local.room.user.UserDatabase
@@ -12,6 +14,7 @@ import com.example.instacloneapp3.presentation.view_models.UserViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -52,4 +55,6 @@ object UserModule {
             .build()
             .create(UserApiService::class.java)
     }
+
+
 }

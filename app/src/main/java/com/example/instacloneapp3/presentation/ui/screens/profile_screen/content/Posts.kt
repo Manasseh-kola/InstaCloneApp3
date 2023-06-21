@@ -20,7 +20,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.screens.profile_screen.PostItem
+import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.PostItem
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
 @Composable
@@ -43,7 +43,7 @@ fun PostedContent(
 
     LazyVerticalGrid(
         state = gridState,
-        userScrollEnabled = scrollState.value == 1023,
+        userScrollEnabled = scrollState.value == scrollState.maxValue,
         columns = GridCells.Adaptive(minSize = 128.dp),
     ){
 

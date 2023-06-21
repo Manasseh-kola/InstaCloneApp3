@@ -23,7 +23,6 @@ fun TimeBar(
     startAnimation: Boolean = false,
     leftTimeBar: Boolean = false,
     playAnimation: MutableState<Boolean>,
-    offsetX: MutableState<Float>,
     offsetY: MutableState<Float>,
     onAnimationEnd: ()->Unit
 ){
@@ -40,7 +39,7 @@ fun TimeBar(
     if (startAnimation){
 
         //Pause Animation if the keyboard is visible (PlayAnimation is false when the keyboard is visible
-        if (playAnimation.value && offsetX.value == 0.0f && offsetY.value == 0.0f) {
+        if (playAnimation.value && offsetY.value == 0.0f) {
             LaunchedEffect(key1 = Unit) {
                 while (progress.value < 1f) {
                     progress.value += 0.01f

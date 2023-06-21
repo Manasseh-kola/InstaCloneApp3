@@ -224,6 +224,13 @@ fun RelationShipScreen(
 @OptIn(ExperimentalFoundationApi::class)
 fun PagerState.offsetForPage(page: Int) = currentPage + currentPageOffsetFraction
 
+
+
+// extension method for current page offset
+@OptIn(ExperimentalFoundationApi::class)
+fun PagerState.calculateCurrentOffsetForPage(page: Int): Float {
+    return (currentPage - page) + currentPageOffsetFraction
+}
 // OFFSET ONLY FROM THE LEFT
 @OptIn(ExperimentalFoundationApi::class)
 fun PagerState.startOffsetForPage(page: Int): Float {

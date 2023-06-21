@@ -33,12 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
+import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import kotlin.math.roundToInt
 
 @Composable
 fun StoryScreen(
-    hideModal: () -> Unit
+    hideModal: () -> Unit,
+    nextStory: () -> Unit
 ){
 
     //List of Stories to be displayed
@@ -54,9 +56,7 @@ fun StoryScreen(
     val playAnimation = remember { mutableStateOf(true)}
 
     //Animate Drag state
-    val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
-    val animatedOffsetX = animateFloatAsState(targetValue = offsetX.value)
     val animatedOffsetY = animateFloatAsState(targetValue = offsetY.value)
 
     //Screen is dragged
@@ -68,40 +68,40 @@ fun StoryScreen(
         modifier = Modifier
             .offset {
                 IntOffset(
-                    animatedOffsetX.value.roundToInt(),
+                    0,
                     animatedOffsetY.value.roundToInt()
                 )
             }
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragEnd = {
-                        val xBreakPoint = 114.06748f
-                        val yBreakPoint = 283.63824f
-                        if (offsetX.value >= xBreakPoint || offsetY.value >= yBreakPoint) {
-                            hideModal()
-                        } else if (offsetX.value != 0.0f && offsetY.value != 0.0f) {
-                            offsetX.value = 0.0f
-                            offsetY.value = 0.0f
-                        }
-                        dragged.value = true
-                        playAnimation.value = true
-                    },
-                    onDragStart = {
-                        if (!dragged.value) {
-                            dragged.value = true
-                        }
-                        if (playAnimation.value) {
-                            playAnimation.value = false
-                        }
-                    }
-                ) { change, dragAmount ->
-//                    playAnimation.value = false
-                    change.consume()
-                    offsetX.value += dragAmount.x
-                    offsetY.value += dragAmount.y
-                }
-            }
+//            .pointerInput(Unit) {
+//                detectDragGestures(
+//                    onDragEnd = {
+//
+//                        val yBreakPoint = 283.63824f
+//                        if (offsetY.value >= yBreakPoint) {
+//                            hideModal()
+//                        } else if (offsetY.value != 0.0f) {
+//                            offsetY.value = 0.0f
+//                        }
+//                        dragged.value = true
+//                        playAnimation.value = true
+//                    },
+//                    onDragStart = {
+//                        if (!dragged.value) {
+//                            dragged.value = true
+//                        }
+//                        if (playAnimation.value) {
+//                            playAnimation.value = false
+//                        }
+//                    }
+//                ) { change, dragAmount ->
+//                    change.consume()
+//                    if (offsetY.value + dragAmount.y >= 0) {
+//                        offsetY.value += dragAmount.y
+//                    }
+//
+//                }
+//            }
     ){
         Box(
             modifier = Modifier
@@ -160,13 +160,12 @@ fun StoryScreen(
                         i == currentPage.value,
                         (i < currentPage.value),
                         playAnimation,
-                        offsetX,
                         offsetY
                     ) {
                         //Call back function after time(5 seconds) expires
                         if (currentPage.value < stories.size - 1) {
                             currentPage.value += 1
-                        } else hideModal()
+                        } else nextStory()
                     }
                 }
 
@@ -210,7 +209,8 @@ fun StoryScreen(
 @Composable
 @Preview(showBackground = true)
 fun StoryScreenPreview(){
+    val appstate = rememberAppState()
     InstaCloneApp3Theme {
-        StoryScreen(){}
+        StoryScreen(appstate::hideModal){}
     }
 }

@@ -1,6 +1,9 @@
 package com.example.instacloneapp3.presentation.ui.screens.home_screen
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,10 +58,10 @@ import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.mock_data.User
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-import kotlinx.coroutines.launch
 
 
 val storyImageModifier = Modifier
@@ -77,6 +79,8 @@ val colorStops = arrayOf(
 fun StoryItem(
     story: Posts,
     navigateToRoute: (String) -> Unit,
+    currentModalSheet: MutableState<ModalSheets>,
+    showModal: MutableState<Boolean>,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -84,7 +88,10 @@ fun StoryItem(
         Box(
             modifier = Modifier
                 .padding(bottom = 8.dp)
-                .clickable(onClick = { navigateToRoute("story") })
+                .clickable {
+                    currentModalSheet.value = ModalSheets.STORY_MODAL
+                    showModal.value = true
+                }
         ) {
 
             Image(
@@ -134,9 +141,9 @@ fun StoriesList(
     navigateToRoute: (String) -> Unit,
     currentModalSheet: MutableState<ModalSheets>,
     drawerState: DrawerState,
+    showModal: MutableState<Boolean>,
 ) {
 
-    val modalScope = rememberCoroutineScope()
 
     LazyRow(
         contentPadding = PaddingValues(10.dp),
@@ -156,11 +163,7 @@ fun StoriesList(
                         modifier = storyImageModifier
                             .clickable {
                                 currentModalSheet.value = ModalSheets.STORY_MODAL
-                                modalScope.launch {
-                                    drawerState.apply {
-                                        if (isClosed) open() else close()
-                                    }
-                                }
+                                showModal.value = true
                             }
 
 
@@ -194,14 +197,22 @@ fun StoriesList(
         items(stories){story->
             StoryItem(
                 story = story,
-                navigateToRoute
+                navigateToRoute,
+                currentModalSheet,
+                showModal
             )
         }
     }
 }
 
 @Composable
-fun PostHeader(profile_picture: Int, user_name: String, modifier: Modifier){
+fun PostHeader(
+    profile_picture: Int,
+    user_name: String,
+    modifier: Modifier,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>
+){
 
     Row(
         modifier = Modifier
@@ -228,8 +239,11 @@ fun PostHeader(profile_picture: Int, user_name: String, modifier: Modifier){
         Icon(
             imageVector = Icons.Outlined.MoreVert,
             contentDescription = "",
-
-            )
+            modifier = Modifier.clickable {
+                currentBottomSheet.value = BottomSheets.POST_ITEM_MORE
+                showBottomSheet.value = true
+            }
+        )
 
 
     }
@@ -237,7 +251,10 @@ fun PostHeader(profile_picture: Int, user_name: String, modifier: Modifier){
 }
 
 @Composable
-fun PostFooter() {
+fun PostFooter(
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -262,11 +279,16 @@ fun PostFooter() {
                 modifier = Modifier
                     .size(25.dp)
             )
+
             Icon(
                 painter = painterResource(id = R.drawable.ic_dm),
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
+                    .clickable {
+                        currentBottomSheet.value = BottomSheets.SHARE_CONTENT
+                        showBottomSheet.value = true
+                    }
             )
         }
         Icon(
@@ -291,12 +313,21 @@ fun UserCaption(username: String, caption: String){
 }
 
 @Composable
-fun UserComment(){
+fun UserComment(showModal: MutableState<Boolean>, currentModalSheet: MutableState<ModalSheets>) {
     Column(
         modifier = Modifier
             .padding(top = 8.dp)
     ){
-        Text("View all comments", fontSize = 12.sp, color = Color.Gray)
+        Text(
+            "View all comments",
+            fontSize = 12.sp,
+            color = Color.Gray,
+            modifier = Modifier
+                .clickable{
+                    currentModalSheet.value = ModalSheets.COMMENT_MODAL
+                    showModal.value = true
+                }
+        )
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically){
             Image(
@@ -317,18 +348,32 @@ fun UserComment(){
 @Composable
 fun PostItem(
     post: Posts,
-    showModal: MutableState<Boolean> = remember{ mutableStateOf(false)}
+    showModal: MutableState<Boolean>,
+    currentModalSheet: MutableState<ModalSheets>,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>,
+    currentHomeModal: MutableState<HomeModals>,
+    showHomeModal: MutableState<Boolean>,
+    currentUser: MutableState<Posts>
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                currentUser.value = post
+                currentHomeModal.value = HomeModals.USERS_PROFILE_SCREEN
+                showHomeModal.value = true
+            }
 
     ){
 
         PostHeader(
             post.profile_picture,
             post.user_name,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth(),
+            currentBottomSheet,
+            showBottomSheet
+        )
         Box(){
             Image(
                 contentScale = ContentScale.Crop,
@@ -340,9 +385,12 @@ fun PostItem(
             )
         }
         Column(modifier = Modifier.padding(10.dp)){
-            PostFooter()
+            PostFooter(
+                currentBottomSheet,
+                showBottomSheet
+            )
             UserCaption(username = post.user_name, caption = post.caption)
-            UserComment()
+            UserComment(showModal, currentModalSheet)
         }
         Divider()
 
@@ -357,7 +405,13 @@ fun PostsList(
     navigateToRoute: (String) -> Unit,
     backNavigation: (String, String) -> Unit,
     currentModalSheet: MutableState<ModalSheets>,
-    drawerState: DrawerState
+    drawerState: DrawerState,
+    showModal: MutableState<Boolean>,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>,
+    showHomeModal: MutableState<Boolean>,
+    currentHomeModal: MutableState<HomeModals>,
+    currentUser: MutableState<Posts>
 ) {
 
     LazyColumn(
@@ -367,20 +421,38 @@ fun PostsList(
 
         ){
         item{
-            TopBar(navigateToRoute, backNavigation)
+                TopBar(
+                    navigateToRoute,
+                    backNavigation,
+                    showModal,
+                    currentModalSheet,
+                    currentHomeModal
+                ){
+                showHomeModal.value = true
+            }
             StoriesList(
                 User(),
                 posts,
                 modifier = Modifier.fillMaxWidth(),
                 navigateToRoute,
                 currentModalSheet,
-                drawerState
+                drawerState,
+                showModal
 
             )
             Divider()
         }
         items(posts){post ->
-            PostItem(post = post)
+            PostItem(
+                post = post,
+                showModal,
+                currentModalSheet,
+                currentBottomSheet,
+                showBottomSheet,
+                currentHomeModal,
+                showHomeModal,
+                currentUser
+            )
         }
 
     }
@@ -393,21 +465,49 @@ fun HomeScreen(
     backNavigation: (String, String) -> Unit,
     currentModalSheet: MutableState<ModalSheets>,
     drawerState: DrawerState,
-
-
+    modalState: MutableState<Boolean>,
+    currentBottomSheet: MutableState<BottomSheets>,
+    showBottomSheet: MutableState<Boolean>,
     ) {
-//    val viewModel: UserViewModel = viewModel()
+
     val posts = PostsRepo()
-    val stories_repo = PostsRepo()
-    Column(modifier = Modifier.fillMaxSize()){
-        PostsList(
-            posts.getPosts(),
-            modifier = Modifier.fillMaxWidth(),
-            navigateToRoute = navigateToRoute,
-            backNavigation = backNavigation,
-            currentModalSheet,
-            drawerState
-        )
+    val currentUser = remember{ mutableStateOf(posts.getPosts()[0])}
+    val currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)}
+    val showHomeModal = remember{ mutableStateOf(false)}
+    Box(){
+        Column(modifier = Modifier.fillMaxSize()) {
+            PostsList(
+                posts.getPosts(),
+                modifier = Modifier.fillMaxWidth(),
+                navigateToRoute = navigateToRoute,
+                backNavigation = backNavigation,
+                currentModalSheet,
+                drawerState,
+                modalState,
+                currentBottomSheet,
+                showBottomSheet,
+                showHomeModal,
+                currentHomeModal,
+                currentUser
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showHomeModal.value,
+            enter = slideInHorizontally(),
+            exit = slideOutHorizontally()
+        ) {
+            HomeModalScreens(
+                currentHomeModal = currentHomeModal,
+                showHomeModal = showHomeModal,
+                navigateToRoute = navigateToRoute ,
+                showBottomSheet = showBottomSheet,
+                currentBottomSheet = currentBottomSheet,
+                currentModalSheet = currentModalSheet,
+                currentUser = currentUser
+
+            )
+        }
     }
 
 }
@@ -421,7 +521,10 @@ fun HomeScreen1Preview() {
             appstate::onNavigateToScreen,
             appstate::backNavigation,
             remember{ mutableStateOf(ModalSheets.NO_SHEET) },
-            rememberDrawerState(initialValue = DrawerValue.Closed)
+            rememberDrawerState(initialValue = DrawerValue.Closed),
+            remember{ mutableStateOf(false)},
+            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
+            remember{ mutableStateOf(false)}
         )
     }
 }

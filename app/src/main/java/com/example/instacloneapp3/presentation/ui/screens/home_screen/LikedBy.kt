@@ -20,13 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
 
 @Composable
-fun LikedBy(){
+fun LikedBy(
+    imageSize: Dp = 28.dp,
+    imageSpacing: Dp = 40.dp,
+    borderWidth: Dp = 2.dp
+){
     val likedBy = PostsRepo().getPosts().take(3)
     Row(
 
@@ -40,10 +45,10 @@ fun LikedBy(){
                 painter = painterResource(likedBy[0].profile_picture),
                 contentDescription = "Liked By",
                 modifier = Modifier
-                    .padding(start = 40.dp)
-                    .size(28.dp)
+                    .padding(start = imageSpacing)
+                    .size(imageSize)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape),
+                    .border(borderWidth, Color.White, CircleShape),
 
             )
 
@@ -52,10 +57,10 @@ fun LikedBy(){
                 painter = painterResource(likedBy[1].profile_picture),
                 contentDescription = "Liked By",
                 modifier = Modifier
-                    .padding(start = 20.dp)
-                    .size(28.dp)
+                    .padding(start = imageSpacing/2)
+                    .size(imageSize)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape)
+                    .border(borderWidth, Color.White, CircleShape)
             )
 
             Image(
@@ -64,9 +69,9 @@ fun LikedBy(){
                 contentDescription = "Liked By",
                 modifier = Modifier
                     .padding(start = 0.dp)
-                    .size(28.dp)
+                    .size(imageSize)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape)
+                    .border(borderWidth, Color.White, CircleShape)
 
             )
 

@@ -6,6 +6,8 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -34,9 +38,13 @@ import com.example.instacloneapp3.presentation.ui.bottom_sheets.AppBottomSheets
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.AppModalSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
+import com.example.instacloneapp3.presentation.ui.screens.comments_screen.CommentScreen
 import com.example.instacloneapp3.presentation.ui.screens.direct_message_screen.DirectMessageScreen
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.calculateCurrentOffsetForPage
+import com.example.instacloneapp3.presentation.ui.screens.story_screen.StoryListScreen
 import com.example.instacloneapp3.presentation.ui.screens.story_screen.StoryScreen
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import kotlin.math.absoluteValue
 
 val tabs = listOf(
     Screen.Home,
@@ -78,8 +86,17 @@ fun App() {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                AppModalSheets(currentModalSheet)
-            }
+                AppModalSheets(currentModalSheet, modalState)
+            },
+            modifier = Modifier
+                    .drawWithContent {
+                        this.drawContent()
+                        drawRect(
+                            Color.Black.copy(
+                                (0.0f)
+                            )
+                        )
+                    }
         ){
             Scaffold(
                 bottomBar = {
@@ -104,7 +121,8 @@ fun App() {
                         showBottomSheet,
                         currentBottomSheet,
                         currentModalSheet,
-                        drawerState
+                        drawerState,
+                        modalState
                     )
                 }
 
@@ -123,24 +141,30 @@ fun App() {
         //Modals (No Bottom Navigation Bar)
         AnimatedVisibility(
             visible = modalState.value,
-            enter = when(currentDestination?.route){
-                "home" -> expandIn()
-                "messages" -> expandHorizontally(expandFrom = Alignment.Start)
+            enter = when(currentModalSheet.value){
+                ModalSheets.STORY_MODAL -> expandIn()
+                ModalSheets.MESSAGES -> expandHorizontally(expandFrom = Alignment.Start)
+                ModalSheets.COMMENT_MODAL -> slideInHorizontally()
                 else -> {
-                    expandIn()}
+                    expandIn()
+                }
             },
-            exit = when(currentDestination?.route){
-                "home" -> scaleOut()
-                "messages" -> shrinkHorizontally(shrinkTowards = Alignment.End)
+            exit = when(currentModalSheet.value){
+                ModalSheets.STORY_MODAL-> scaleOut()
+                ModalSheets.MESSAGES -> shrinkHorizontally(shrinkTowards = Alignment.End)
+                ModalSheets.COMMENT_MODAL -> slideOutHorizontally()
                 else -> {
                     scaleOut()
                 }
             },
 
             ){
-            when(currentDestination?.route){
-                "home" -> StoryScreen(appState::hideModal)
-                "messages" -> DirectMessageScreen(appState::hideModal)
+                when(currentModalSheet.value){
+                    ModalSheets.STORY_MODAL -> StoryListScreen(appState::hideModal)
+                    ModalSheets.MESSAGES -> DirectMessageScreen(appState::hideModal)
+                    ModalSheets.COMMENT_MODAL -> CommentScreen(showModal = modalState, appState::hideModal)
+                    else -> {}
+
             }
         }
 

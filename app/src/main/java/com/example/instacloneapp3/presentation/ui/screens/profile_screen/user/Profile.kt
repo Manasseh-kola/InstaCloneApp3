@@ -1,14 +1,9 @@
-package com.example.instacloneapp3.presentation.ui.screens.profile_screen
+package com.example.instacloneapp3.presentation.ui.screens.profile_screen.user
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
@@ -58,9 +53,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +63,7 @@ import com.example.instacloneapp3.presentation.mock_data.Stories
 import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
+import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.modals.profile_screen_modals.PostsModal
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImageModifier
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
@@ -404,7 +397,8 @@ fun PostItem(
 fun ProfileScreen(
     navigateToRoute: (String) -> Unit,
     showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,) {
+    currentBottomSheet: MutableState<BottomSheets>,
+    currentModalSheet: MutableState<ModalSheets>,) {
 
 
     val scrollState = rememberScrollState()
@@ -433,6 +427,8 @@ fun ProfileScreen(
     val scrollEnabled = remember { mutableStateOf(true)}
     val currentContent = remember{ mutableStateOf("postsContent")}
     val transformOriginOffset = remember{ mutableStateOf(Offset(0f,0f))}
+
+    
 
     when(currentContent.value){
         "postsContent" -> {
@@ -508,7 +504,10 @@ fun ProfileScreen(
         ) {
             PostsModal(
                 showModal,
-                modalStartScrollIndex
+                modalStartScrollIndex,
+                currentModalSheet,
+                currentBottomSheet,
+                showBottomSheet
             )
         }
     }
@@ -523,7 +522,8 @@ fun ProfileScreenPreview(){
         ProfileScreen(
             appstate::onNavigateToScreen,
             remember { mutableStateOf(false) },
-            remember{ mutableStateOf(BottomSheets.NO_SHEET)}
+            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
+            remember{ mutableStateOf(ModalSheets.NO_SHEET)}
         )
     }
 }

@@ -1,10 +1,12 @@
 package com.example.instacloneapp3.presentation.ui.screens
 
+
+import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -41,15 +45,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
+import com.example.instacloneapp3.presentation.ui.components.VideoPlayer
 import com.example.instacloneapp3.presentation.ui.rememberAppState
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.calculateCurrentOffsetForPage
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.VideoViewModel
+import kotlin.math.absoluteValue
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ReelsHeader(show: Boolean){
-    var text = if (show) "Reels"
+fun ReelsHeader(pagerState: PagerState) {
+    var text = if (pagerState.currentPage == 0) "Reels"
     else ""
     Row(
         modifier = Modifier
@@ -197,31 +208,38 @@ fun Reel(
     post: Posts,
     modifier: Modifier,
     navigateToRoute: (String) -> Unit,
+    videoViewModal: VideoViewModel,
 ){
+
     Box(
         modifier =  modifier
-
+            .fillMaxSize()
+            .background(Color.Black)
+            .drawWithContent {
+                this.drawContent()
+                drawRect(
+                    Color.Black.copy(
+                        (0.3F)
+                    )
+                )
+            }
 
     ){
-        Image(
-            contentScale = ContentScale.Crop,
-            painter = painterResource(id = post.imageRes),
-            contentDescription = "",
-            modifier =  Modifier.fillMaxSize(),
 
-        )
 
-        Canvas(modifier = Modifier.fillMaxSize(),
+        VideoPlayer()
 
-            onDraw = {
-                val size = size
-
-                drawRect(
-                    color = Color.hsv(0F,0F,0F,0.2F),
-                    size = size
-
-                    )
-            })
+//        Canvas(modifier = Modifier.fillMaxSize(),
+//
+//            onDraw = {
+//                val size = size
+//
+//                drawRect(
+//                    color = Color.hsv(0F,0F,0F,0.2F),
+//                    size = size
+//
+//                    )
+//            })
 
         CommentSection(
             userName = post.user_name,
@@ -247,45 +265,63 @@ fun Reel(
     }
 }
 
+
+@Composable
+fun ReelVideo(){
+
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReelsScreen(
     navigateToRoute: (String) -> Unit,
-    backNavigation: (String, String) -> Unit
+    backNavigation: (String, String) -> Unit,
+    videoViewModal: VideoViewModel = hiltViewModel<VideoViewModel>()
 ) {
+    val pagerState = rememberPagerState()
     val posts = PostsRepo().getPosts()
+    val listState = rememberLazyListState()
+
     Box(
         modifier = Modifier.fillMaxSize()
     ){
-        val listState = rememberLazyListState()
 
-        var show = false
-        if (listState.firstVisibleItemIndex == 0){
-            show = true
-        }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            state = listState,
-            flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
-
-        ) {
-
-            items(posts){ post ->
+        VerticalPager(
+            pageCount = posts.size,
+            state = pagerState
+        ) {page ->
                 Reel(
-                    post,
+                    posts[page],
                     modifier = Modifier
-                        .fillParentMaxSize()
                         .fillMaxSize(),
-                    navigateToRoute
+                    navigateToRoute,
+                    videoViewModal
                 )
-            }
-
-
-
         }
 
-        ReelsHeader(show)
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxSize(),
+//            state = listState,
+//            flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+//
+//        ) {
+//
+//            items(posts){ post ->
+//                Reel(
+//                    post,
+//                    modifier = Modifier
+//                        .fillParentMaxSize()
+//                        .fillMaxSize(),
+//                    navigateToRoute
+//                )
+//            }
+//
+//
+//
+//        }
+
+        ReelsHeader(pagerState)
 
         }
     }

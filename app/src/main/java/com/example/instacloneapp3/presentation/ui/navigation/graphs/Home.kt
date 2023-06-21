@@ -19,7 +19,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeScreen
 import com.example.instacloneapp3.presentation.ui.screens.MessagesScreen
-import com.example.instacloneapp3.presentation.ui.screens.profile_screen.ProfileScreen
+import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileScreen
 import com.example.instacloneapp3.presentation.ui.screens.ReelsScreen
 import com.example.instacloneapp3.presentation.ui.screens.SearchScreen
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
@@ -46,13 +46,24 @@ fun NavGraphBuilder.authenticatedGraph(
     currentBottomSheet: MutableState<BottomSheets>,
     currentModalSheet: MutableState<ModalSheets>,
     drawerState: DrawerState,
+    modalState: MutableState<Boolean>,
 ){
     navigation(startDestination = "home", route = "authenticated"){
-        composable(Screen.Home.route){ HomeScreen(navigateToRoute,backNavigation, currentModalSheet, drawerState) }
+        composable(Screen.Home.route){
+            HomeScreen(
+                navigateToRoute,
+                backNavigation,
+                currentModalSheet,
+                drawerState,
+                modalState,
+                currentBottomSheet,
+                showBottomSheet
+            )
+        }
         composable(Screen.Search.route){ SearchScreen() }
         composable(Screen.New.route){ Row(){ Text(text = "Add new") } }
         composable(Screen.Reels.route){ ReelsScreen(navigateToRoute,backNavigation) }
-        composable(Screen.Profile.route){ ProfileScreen(navigateToRoute, showBottomSheet, currentBottomSheet) }
+        composable(Screen.Profile.route){ ProfileScreen(navigateToRoute, showBottomSheet, currentBottomSheet, currentModalSheet) }
         composable(Screen.Messages.route){ MessagesScreen(backNavigation, navigateToRoute) }
         composable(
             Screen.Relationship.route,
