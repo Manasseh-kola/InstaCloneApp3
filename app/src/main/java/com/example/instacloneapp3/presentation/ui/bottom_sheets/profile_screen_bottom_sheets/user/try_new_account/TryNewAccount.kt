@@ -1,8 +1,7 @@
-package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets.try_new_account
+package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,12 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.instacloneapp3.presentation.ui.screens.home_screen.LikedBy
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
 enum class ModalPages{
@@ -40,11 +38,11 @@ val modalPages = listOf(
 )
 
 @Composable
-fun PagerIndicator(color: Color = Color.Gray){
+fun PagerIndicator(color: Color = Color.Gray, indicatorSize: Dp = 4.dp){
     Canvas(
         modifier = Modifier
             .padding(horizontal = 3.dp)
-            .size(4.dp),
+            .size(indicatorSize),
         onDraw = {
             val canvasWidth = size.width
             val canvasHeight = size.height

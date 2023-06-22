@@ -1,4 +1,4 @@
-package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets.try_new_account
+package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

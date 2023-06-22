@@ -7,5 +7,5 @@ data class Posts (
     val caption : String,
     val user_name: String,
     val profile_picture: Int,
-
+    val mediaContent: List<Int> = mutableListOf<Int>()
 )

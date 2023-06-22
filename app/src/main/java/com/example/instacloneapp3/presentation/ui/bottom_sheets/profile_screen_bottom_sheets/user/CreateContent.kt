@@ -1,4 +1,4 @@
-package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_bottom_sheets
+package com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircle
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.PlayArrow

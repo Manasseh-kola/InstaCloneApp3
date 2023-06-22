@@ -1,4 +1,4 @@
-package com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bootom_sheets
+package com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bottom_sheets
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -2,6 +2,7 @@ package com.example.instacloneapp3.presentation.ui.modals.profile_screen_modals
 
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Divider
@@ -50,6 +52,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostItem(
     post: Posts,
@@ -58,6 +61,8 @@ fun PostItem(
     currentBottomSheet: MutableState<BottomSheets>,
     showBottomSheet: MutableState<Boolean>,
 ) {
+
+    val pagerState = rememberPagerState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,7 +92,8 @@ fun PostItem(
         Column(modifier = Modifier.padding(10.dp)){
             PostFooter(
                 currentBottomSheet,
-                showBottomSheet
+                showBottomSheet,
+                pagerState
             )
             UserCaption(username = post.user_name, caption = post.caption)
             UserComment(showModal, currentModalSheet)
@@ -161,10 +167,9 @@ fun PostsModal(
                     onDragEnd = {
                         val xBreakPoint = 114.06748f
                         val yBreakPoint = 283.63824f
-                        if(offsetX.value >= xBreakPoint || offsetY.value >= yBreakPoint){
+                        if (offsetX.value >= xBreakPoint || offsetY.value >= yBreakPoint) {
                             showModal.value = false
-                        }
-                        else if(offsetX.value != 0.0f && offsetY.value != 0.0f) {
+                        } else if (offsetX.value != 0.0f && offsetY.value != 0.0f) {
                             offsetX.value = 0.0f
                             offsetY.value = 0.0f
                         }

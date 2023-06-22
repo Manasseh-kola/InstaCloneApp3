@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,6 +26,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
@@ -59,6 +63,7 @@ import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.mock_data.User
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account.PagerIndicator
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
@@ -250,19 +255,24 @@ fun PostHeader(
 
 }
 
+
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostFooter(
     currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>
+    showBottomSheet: MutableState<Boolean>,
+    pagerState: PagerState,
+    pageCount: Int = 0
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
     ){
         Row(
             modifier = Modifier
+                .align(Alignment.CenterStart)
                 .width(100.dp),
             horizontalArrangement = Arrangement.SpaceBetween
 
@@ -291,10 +301,27 @@ fun PostFooter(
                     }
             )
         }
+
+        //pager Indicator
+        if(pageCount > 1){
+            Row(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            ) {
+                for(page in 0 until pageCount){
+                    val selectedColor = if(page == pagerState.currentPage) Color(55, 151, 239, 255)
+                    else Color.Gray
+                    PagerIndicator(selectedColor)
+                }
+            }
+
+        }
+
         Icon(
             painter = painterResource(id = R.drawable.bookmark_outline),
             contentDescription = "",
             modifier = Modifier
+                .align(Alignment.CenterEnd)
                 .size(25.dp)
         )
     }
@@ -344,7 +371,27 @@ fun UserComment(showModal: MutableState<Boolean>, currentModalSheet: MutableStat
         }
     }
 }
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PostItemPager(
+    postContent: List<Int>,
+    pagerState: PagerState
+){
+    HorizontalPager(
+        pageCount = postContent.size,
+        state = pagerState
+    ) {page ->
+        Image(
+            contentScale = ContentScale.Crop,
+            painter = painterResource(id = postContent[page]),
+            contentDescription = "",
+            modifier = Modifier
+                .size(450.dp)
+        )
+    }
+}
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostItem(
     post: Posts,
@@ -356,6 +403,8 @@ fun PostItem(
     showHomeModal: MutableState<Boolean>,
     currentUser: MutableState<Posts>
 ) {
+
+    val pagerState = rememberPagerState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -375,19 +424,17 @@ fun PostItem(
             showBottomSheet
         )
         Box(){
-            Image(
-                contentScale = ContentScale.Crop,
-                painter = painterResource(id = post.imageRes),
-                contentDescription = "",
-                modifier = Modifier
-                    .size(450.dp)
-
+            PostItemPager(
+                postContent = post.mediaContent,
+                pagerState = pagerState
             )
         }
         Column(modifier = Modifier.padding(10.dp)){
             PostFooter(
                 currentBottomSheet,
-                showBottomSheet
+                showBottomSheet,
+                pagerState,
+                post.mediaContent.size
             )
             UserCaption(username = post.user_name, caption = post.caption)
             UserComment(showModal, currentModalSheet)
