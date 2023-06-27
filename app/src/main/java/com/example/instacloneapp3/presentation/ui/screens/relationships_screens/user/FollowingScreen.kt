@@ -1,9 +1,8 @@
-package com.example.instacloneapp3.presentation.ui.screens.relationships_screens
+package com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,8 +21,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -47,14 +45,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
 
@@ -154,16 +149,21 @@ fun CategoryItem(user1: Posts, user2: Posts, textInfo: List<String>){
                 painter = painterResource(id = user2.profile_picture),
                 contentDescription = "",
                 modifier = Modifier
-                    .offset(x = 10.dp, y = 10.dp)
+                    .offset(x = 15.dp, y = 15.dp)
                     .size(45.dp)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape)
+                    .border(4.dp, Color.White, CircleShape)
 
             )
         }
         Column() {
             Text("${textInfo[0]}", fontWeight = FontWeight.Bold)
-            Text("${user1.user_name} and ${textInfo[1]} others", color = Color.Gray)
+            Text(
+                text ="${user1.user_name} and ${textInfo[1]} others",
+                color = Color.Gray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -226,7 +226,11 @@ fun FollowingButton(
 }
 
 @Composable
-fun FollowingItem(following: Posts){
+fun FollowingItem(following: Posts, userProfile: Boolean = true, isFollowing: Boolean = true){
+
+    val text = if(isFollowing) "Following" else "Follow"
+    val buttonColor = if(isFollowing) Color(240, 240, 240) else Color(3, 169, 244, 255)
+    val textColor = if(isFollowing) Color.Black else Color.White
     Row(
         modifier = Modifier
             .padding(horizontal = 10.dp)
@@ -249,23 +253,37 @@ fun FollowingItem(following: Posts){
                 Text(
                     text = "${following.user_name}",
                     maxLines = 1,
+                    fontWeight = FontWeight(600),
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier = Modifier.fillMaxWidth(0.3f)
                 )
                 Text(
                     text = "${following.user_name}",
+                    color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier = Modifier.fillMaxWidth(0.3f)
                 )
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FollowingButton(text = "Following", width = 0.5f)
+
+            FollowingButton(text = text, width = 0.6f, buttonColor = buttonColor, textColor = textColor)
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "")
+            if(!userProfile){
+                if(!isFollowing){
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp)
+                    )
+                }else {
+                    Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "")
+                }
+            }
+
         }
     }
 }
@@ -288,7 +306,7 @@ fun FollowingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             item {
-                RelationshipSearchBar(input = search , placeholder = "Search",  width = 0.9f )
+                RelationshipSearchBar(input = search , placeholder = "Search",  width = 0.9f)
                 Divider(Modifier.padding(vertical = 10.dp))
                 FollowingCategories(followingList = followingList)
                 Divider(Modifier.padding(vertical = 10.dp))

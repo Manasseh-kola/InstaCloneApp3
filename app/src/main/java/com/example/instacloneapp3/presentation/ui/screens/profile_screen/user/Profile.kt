@@ -143,13 +143,14 @@ fun ProfileInfo(
     amount:String,
     info:String,
     navigateToRoute: (String) -> Unit,
-    destination:String
+    destination:String,
+    userIndex: Int = 0
 ){
     val currentPage = if(info == "Followers") "0" else "1"
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = {navigateToRoute("$destination/$currentPage")})
+        modifier = Modifier.clickable(onClick = {navigateToRoute("$destination/$currentPage*$userIndex")})
     ) {
         Text(amount)
         Text(info)

@@ -35,11 +35,12 @@ class VideoViewModel @Inject constructor(
 
     fun playVideo(){
         player.setMediaItem(videoItem.mediaItem)
+        player.play()
     }
 
     fun releasePlayer(){
         if (player.currentMediaItem != null){
-            player.stop()
+            player.pause()
         }
 
     }

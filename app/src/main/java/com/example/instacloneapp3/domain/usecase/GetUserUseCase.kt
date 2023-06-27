@@ -11,7 +11,7 @@ class GetUserUseCase(
 ) {
     operator fun invoke(user : String): Flow<UILoadState<User>>{
         if(user.isBlank()){
-            return flow {  }
+            return flow { }
         }
         return repository.getUser(user)
     }

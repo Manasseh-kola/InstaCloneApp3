@@ -1,24 +1,18 @@
-package com.example.instacloneapp3.presentation.ui.screens.relationships_screens
+package com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +53,9 @@ fun FollowersItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
-        Row(){
+        Row(
+            modifier = Modifier.fillMaxWidth(0.6f)
+        ){
             Image(
                 contentScale = ContentScale.Crop,
                 painter = painterResource(id = following.profile_picture),
@@ -75,21 +71,19 @@ fun FollowersItem(
                     text = "${following.user_name}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = "${following.user_name}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(0.2f)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            FollowingButton(text = text, width = 0.5f, textColor, buttonColor)
-        }
+
+        FollowingButton(text = text, width = 0.7f, textColor, buttonColor)
+
     }
 }
 

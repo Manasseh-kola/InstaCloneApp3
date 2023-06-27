@@ -448,6 +448,7 @@ fun PostItem(
 @Composable
 fun PostsList(
     posts: List<Posts>,
+    feeds:MutableList<Pair<Posts, Int>>,
     modifier: Modifier,
     navigateToRoute: (String) -> Unit,
     backNavigation: (String, String) -> Unit,
@@ -489,23 +490,38 @@ fun PostsList(
             )
             Divider()
         }
-        items(posts){post ->
-            PostItem(
-                post = post,
-                showModal,
-                currentModalSheet,
-                currentBottomSheet,
-                showBottomSheet,
-                currentHomeModal,
-                showHomeModal,
-                currentUser
-            )
+        items(feeds){feed ->
+
+            when(feed.second) {
+                0 -> {
+                    PostItem(
+                        post = feed.first,
+                        showModal,
+                        currentModalSheet,
+                        currentBottomSheet,
+                        showBottomSheet,
+                        currentHomeModal,
+                        showHomeModal,
+                        currentUser
+                    )
+                }
+
+                1-> {
+                    SuggestedReels()
+                }
+                2->{
+                    SuggestedForYou()
+                }
+
+            }
+
         }
 
     }
 }
 
 val user = User()
+
 @Composable
 fun HomeScreen(
     navigateToRoute: (String) -> Unit,
@@ -521,21 +537,31 @@ fun HomeScreen(
     val currentUser = remember{ mutableStateOf(posts.getPosts()[0])}
     val currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)}
     val showHomeModal = remember{ mutableStateOf(false)}
+
+
+    val feeds = mutableListOf<Pair<Posts, Int>>()
+    posts.getPosts().forEach { feeds.add(Pair(it, 0)) }
+    feeds.addAll(feeds)
+    feeds[3] = Pair(feeds[0].first, 1)
+    feeds[10] = Pair(feeds[0].first, 2)
+
+
     Box(){
         Column(modifier = Modifier.fillMaxSize()) {
             PostsList(
-                posts.getPosts(),
+                posts = posts.getPosts(),
+                feeds = feeds,
                 modifier = Modifier.fillMaxWidth(),
                 navigateToRoute = navigateToRoute,
                 backNavigation = backNavigation,
-                currentModalSheet,
-                drawerState,
-                modalState,
-                currentBottomSheet,
-                showBottomSheet,
-                showHomeModal,
-                currentHomeModal,
-                currentUser
+                currentModalSheet = currentModalSheet,
+                drawerState = drawerState,
+                showModal = modalState,
+                currentBottomSheet = currentBottomSheet,
+                showBottomSheet = showBottomSheet,
+                showHomeModal = showHomeModal,
+                currentHomeModal = currentHomeModal,
+                currentUser = currentUser
             )
         }
 

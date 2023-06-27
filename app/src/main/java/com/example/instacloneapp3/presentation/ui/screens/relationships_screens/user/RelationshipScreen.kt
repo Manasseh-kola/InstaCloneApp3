@@ -1,6 +1,5 @@
-package com.example.instacloneapp3.presentation.ui.screens.relationships_screens
+package com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi

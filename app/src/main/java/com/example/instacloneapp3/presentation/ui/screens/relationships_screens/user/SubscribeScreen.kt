@@ -1,6 +1,5 @@
-package com.example.instacloneapp3.presentation.ui.screens.relationships_screens
+package com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

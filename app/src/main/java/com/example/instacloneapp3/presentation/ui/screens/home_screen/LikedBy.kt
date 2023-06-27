@@ -30,7 +30,8 @@ import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 fun LikedBy(
     imageSize: Dp = 28.dp,
     imageSpacing: Dp = 40.dp,
-    borderWidth: Dp = 2.dp
+    borderWidth: Dp = 2.dp,
+    borderColor: Color = Color.White
 ){
     val likedBy = PostsRepo().getPosts().take(3)
     Row(
@@ -48,7 +49,7 @@ fun LikedBy(
                     .padding(start = imageSpacing)
                     .size(imageSize)
                     .clip(CircleShape)
-                    .border(borderWidth, Color.White, CircleShape),
+                    .border(borderWidth, borderColor, CircleShape),
 
             )
 
@@ -60,7 +61,7 @@ fun LikedBy(
                     .padding(start = imageSpacing/2)
                     .size(imageSize)
                     .clip(CircleShape)
-                    .border(borderWidth, Color.White, CircleShape)
+                    .border(borderWidth, borderColor, CircleShape)
             )
 
             Image(
@@ -71,7 +72,7 @@ fun LikedBy(
                     .padding(start = 0.dp)
                     .size(imageSize)
                     .clip(CircleShape)
-                    .border(borderWidth, Color.White, CircleShape)
+                    .border(borderWidth, borderColor, CircleShape)
 
             )
 

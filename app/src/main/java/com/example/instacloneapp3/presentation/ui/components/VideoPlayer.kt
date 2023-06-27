@@ -49,7 +49,7 @@ fun VideoPlayer(
     AndroidView(
         factory = {context ->
             PlayerView(context).also{playerView ->
-                playerView.useController = true
+                playerView.useController = false
                 playerView.player = videoViewModel.player
             }
         },

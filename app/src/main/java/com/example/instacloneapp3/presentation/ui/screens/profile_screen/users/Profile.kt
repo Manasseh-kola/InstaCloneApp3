@@ -1,6 +1,7 @@
 package com.example.instacloneapp3.presentation.ui.screens.profile_screen.users
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -59,6 +62,7 @@ import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeModals
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.LikedBy
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.SuggestedForYou
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImageModifier
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.content.UserContent
@@ -78,9 +82,11 @@ fun UsersProfileScreen(
     showHomeModal: MutableState<Boolean>,
     currentUser: MutableState<Posts>
 ){
+    var userIndex = PostsRepo().getPosts().indexOfFirst{ it.user_name == currentUser.value.user_name}
 
 
     val profileOwner = currentUser.value
+    val configuration = LocalConfiguration.current
     val scrollState = rememberScrollState()
     val postsGridState = rememberLazyGridState()
     val reelsGridState = rememberLazyGridState()
@@ -101,6 +107,8 @@ fun UsersProfileScreen(
             taggedGridState.firstVisibleItemScrollOffset > 0
         }
     }
+
+    val suggestionDropDown = remember{ mutableStateOf(false)}
     val modalStartScrollIndex = remember{ mutableStateOf(0)}
     val showModal = remember{ mutableStateOf(false)}
     val scrollEnabled = remember { mutableStateOf(true)}
@@ -143,8 +151,16 @@ fun UsersProfileScreen(
 
             ProfileInfoTab(
                 profileOwner = profileOwner,
-                navigateToRoute = navigateToRoute
+                navigateToRoute = navigateToRoute,
+                suggestionDropDown = suggestionDropDown,
+                userIndex = userIndex
+
             )
+
+            AnimatedVisibility(visible = suggestionDropDown.value) {
+                SuggestedForYou(configuration.screenWidthDp.dp * 0.4f)
+                Spacer(Modifier.height(10.dp))
+            }
             
             StoryHighlights()
 
@@ -214,11 +230,20 @@ fun ProfileHeader(
         Row(
             modifier = Modifier.align(Alignment.CenterEnd)
         ){
+
+            //Notifications Header Button
             Icon(
                 imageVector = Icons.Outlined.Notifications,
                 contentDescription = "",
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        currentBottomSheet.value = BottomSheets.USERS_PROFILE_NOTIFICATIONS
+                        showBottomSheet.value = true
+                    }
             )
+
+
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "",
@@ -232,8 +257,11 @@ fun ProfileHeader(
 @Composable
 fun ProfileInfoTab(
     profileOwner: Posts,
-    navigateToRoute: (String) -> Unit
-){
+    navigateToRoute: (String) -> Unit,
+    suggestionDropDown: MutableState<Boolean>,
+    userIndex: Int,
+
+    ){
     val followers = PostsRepo().getPosts().takeLast(2)
     Column(
         modifier = Modifier
@@ -263,8 +291,8 @@ fun ProfileInfoTab(
             ) {
 
                 ProfileInfo("7", "Posts",navigateToRoute,"")
-                ProfileInfo(user.followers_count.toString(), "Followers",navigateToRoute,"relationship")
-                ProfileInfo(user.following_count.toString(), "Following",navigateToRoute,"relationship")
+                ProfileInfo(user.followers_count.toString(), "Followers",navigateToRoute,"usersRelationship", userIndex)
+                ProfileInfo(user.following_count.toString(), "Following",navigateToRoute,"usersRelationship", userIndex)
             }
 
         }
@@ -365,6 +393,10 @@ fun ProfileInfoTab(
                 Icon(
                     imageVector = Icons.Default.Person, contentDescription = "",
                     tint = Color.Black,
+                    modifier = Modifier
+                        .clickable {
+                            suggestionDropDown.value = !suggestionDropDown.value
+                        }
                 )
             }
         }

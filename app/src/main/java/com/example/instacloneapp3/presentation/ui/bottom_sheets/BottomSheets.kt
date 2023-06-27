@@ -10,6 +10,7 @@ import com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bott
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.CreateNewContent
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.manage_account.ManageUserAccount
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account.TryNewAccount
+import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.users.UsersProfileNotifications
 
 enum class BottomSheets {
 
@@ -45,7 +46,8 @@ fun AppBottomSheets(
             BottomSheets.MANAGE_USER_ACCOUNT -> ManageUserAccount()
             BottomSheets.POST_ITEM_MORE -> PostItemMore()
             BottomSheets.SHARE_CONTENT -> ShareContent()
-            BottomSheets.USERS_PROFILE_NOTIFICATIONS -> {}
+            BottomSheets.USERS_PROFILE_NOTIFICATIONS -> {
+                UsersProfileNotifications()}
         }
     }
 }

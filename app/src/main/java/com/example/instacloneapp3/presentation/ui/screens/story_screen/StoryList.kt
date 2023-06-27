@@ -19,10 +19,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.calculateCurrentOffsetForPage
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.calculateCurrentOffsetForPage
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import kotlinx.coroutines.launch
-import java.lang.Float.min
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)

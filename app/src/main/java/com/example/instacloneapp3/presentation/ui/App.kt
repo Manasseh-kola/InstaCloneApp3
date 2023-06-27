@@ -40,11 +40,8 @@ import com.example.instacloneapp3.presentation.ui.modals.AppModalSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.comments_screen.CommentScreen
 import com.example.instacloneapp3.presentation.ui.screens.direct_message_screen.DirectMessageScreen
-import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.calculateCurrentOffsetForPage
 import com.example.instacloneapp3.presentation.ui.screens.story_screen.StoryListScreen
-import com.example.instacloneapp3.presentation.ui.screens.story_screen.StoryScreen
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-import kotlin.math.absoluteValue
 
 val tabs = listOf(
     Screen.Home,

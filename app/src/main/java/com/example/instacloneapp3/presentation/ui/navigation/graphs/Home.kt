@@ -20,11 +20,12 @@ import androidx.navigation.navigation
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeScreen
 import com.example.instacloneapp3.presentation.ui.screens.MessagesScreen
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileScreen
-import com.example.instacloneapp3.presentation.ui.screens.ReelsScreen
+import com.example.instacloneapp3.presentation.ui.screens.reels.ReelsScreen
 import com.example.instacloneapp3.presentation.ui.screens.SearchScreen
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
-import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.RelationShipScreen
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipScreen
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.users.UsersRelationShipScreen
 
 
 sealed class Screen(val route: String, val icon : ImageVector) {
@@ -35,6 +36,7 @@ sealed class Screen(val route: String, val icon : ImageVector) {
     object Profile : Screen("profile", Icons.Outlined.Person)
     object Messages: Screen("messages", Icons.Outlined.MailOutline)
     object Relationship: Screen("relationship/{currentPage}", Icons.Outlined.MailOutline)
+    object UsersRelationship: Screen("usersRelationship/{currentPage}", Icons.Outlined.MailOutline)
 
 }
 
@@ -69,7 +71,18 @@ fun NavGraphBuilder.authenticatedGraph(
             Screen.Relationship.route,
             arguments = listOf(navArgument("currentPage") { type = NavType.StringType })
         ){ backStackEntry ->
-            RelationShipScreen(backNavigation, backStackEntry.arguments?.getString("currentPage"))
+            val argList = backStackEntry.arguments?.getString("currentPage")?.split("*")!!
+            val page = argList[0]
+            RelationShipScreen(backNavigation, page)
+        }
+        composable(
+            Screen.UsersRelationship.route,
+            arguments = listOf(navArgument("currentPage") { type = NavType.StringType })
+        ){ backStackEntry ->
+            val argList = backStackEntry.arguments?.getString("currentPage")?.split("*")!!
+            val page = argList[0]
+            val userIndex = argList[1].toInt()
+            UsersRelationShipScreen(backNavigation, page, userIndex)
         }
     }
 }

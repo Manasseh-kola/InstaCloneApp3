@@ -37,8 +37,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.RelationShipSelector
-import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.startOffsetForPage
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipSelector
+import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.startOffsetForPage
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

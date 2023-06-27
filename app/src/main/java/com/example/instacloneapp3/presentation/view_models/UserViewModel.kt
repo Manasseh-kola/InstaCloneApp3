@@ -38,7 +38,7 @@ class UserViewModel @Inject constructor(
                 }
                 is UILoadState.Error -> {
                     _userState.value = UserState(
-                        error = "An unexpected error occured"
+                        error = "An unexpected error occurred"
                     )
                 }
                 is UILoadState.Loading -> {
