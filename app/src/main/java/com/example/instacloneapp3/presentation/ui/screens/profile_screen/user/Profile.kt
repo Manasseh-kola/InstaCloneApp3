@@ -70,327 +70,7 @@ import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.content.UserContent
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
-@Composable
-fun ProfileDropDown(
-    username: String,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>
-){
-    Row{
-        Text(username,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(Modifier.size(5.dp))
 
-        Icon(
-            Icons.Filled.KeyboardArrowDown,
-            "",
-            Modifier.clickable{
-                currentBottomSheet.value = BottomSheets.TRY_NEW_ACCOUNT
-                showBottomSheet.value = true
-
-            }
-        )
-
-    }
-}
-
-@Composable
-fun ProfileHeader(
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>
-) {
-    Row(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ){
-        ProfileDropDown(user.user_name, showBottomSheet, currentBottomSheet)
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.ic_outlined_add),
-                contentDescription = "",
-                modifier = Modifier
-                    .size(18.dp)
-                    .clickable {
-                        currentBottomSheet.value = BottomSheets.CREATE_NEW_CONTENT
-                        showBottomSheet.value = true
-                    }
-            )
-            Spacer(Modifier.width(20.dp))
-            Icon(
-                imageVector = Icons.Outlined.Menu,
-                contentDescription = "",
-                modifier = Modifier
-                    .clickable {
-                        currentBottomSheet.value = BottomSheets.MANAGE_USER_ACCOUNT
-                        showBottomSheet.value = true
-                    }
-
-            )
-        }
-
-    }
-}
-
-@Composable
-fun ProfileInfo(
-    amount:String,
-    info:String,
-    navigateToRoute: (String) -> Unit,
-    destination:String,
-    userIndex: Int = 0
-){
-    val currentPage = if(info == "Followers") "0" else "1"
-    Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = {navigateToRoute("$destination/$currentPage*$userIndex")})
-    ) {
-        Text(amount)
-        Text(info)
-    }
-}
-
-@Composable
-fun StoryHighlightItem(story: Stories) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-
-        Image(
-            contentScale = ContentScale.Crop,
-            painter = painterResource(id = story.imageRes),
-            contentDescription = "",
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-        )
-
-        Text("Category")
-    }
-
-}
-
-@Composable
-fun StoryHighlightList(stories: List<Stories>) {
-
-    LazyRow(
-        contentPadding = PaddingValues(10.dp),
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        item{
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Box(
-
-                ) {
-                    Canvas(modifier = Modifier.size(50.dp),
-                        onDraw = {
-                            val canvasWidth = size.width
-                            val canvasHeight = size.height
-
-                            drawCircle(
-                                color = Color.Gray,
-                                center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),
-                                radius = size.minDimension / 1.9F,
-                            )
-
-                            drawCircle(
-                                color = Color.LightGray,
-                                center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),
-                                radius = size.minDimension / 2F,
-
-                                )
-                        })
-
-                    Icon(
-                        imageVector = Icons.Rounded.Add,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(30.dp),
-                        tint = Color.Gray,
-
-                    )
-                }
-                Text("New")
-            }
-
-
-        }
-
-        items(stories){story->
-            StoryHighlightItem(story = story)
-        }
-    }
-}
-
-@Composable
-fun StoryHighlightsDropDown(){
-
-    val stories = StoriesRepo().getStories()
-    var expand = remember { mutableStateOf(false) }
-    val icon = if (expand.value)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
-
-    Column(){
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp)
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null,
-                    onClick = { expand.value = !expand.value }
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-
-
-            ) {
-            Text(
-                "Story Highlights",
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.size(5.dp))
-
-            Icon(
-                icon,
-                ""
-            )
-
-        }
-        if (expand.value){
-            StoryHighlightList(stories)
-        }else{
-            Divider()
-        }
-    }
-}
-
-
-@Composable
-fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
-
-    val stories = StoriesRepo().getStories()
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(5.dp)
-                .fillMaxWidth()
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box {
-                    Image(
-                        contentScale = ContentScale.Crop,
-                        painter = painterResource(id = user.profile_picture),
-                        contentDescription = "",
-                        modifier = storyImageModifier
-                    )
-                    Icon(
-                        imageVector = Icons.Outlined.AddCircle,
-                        contentDescription = "",
-                        tint = Color(3, 109, 202, 201),
-                        modifier = Modifier
-                            .offset(y = 3.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .padding(1.dp)
-                            .size(25.dp)
-                            .align(Alignment.BottomEnd)
-
-                    )
-                }
-
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .width(250.dp)
-                    .offset(y = 10.dp)
-                    .padding(5.dp)
-            ) {
-
-                ProfileInfo("7", "Posts",navigateToRoute,"")
-                ProfileInfo(user.followers_count.toString(), "Followers",navigateToRoute,"relationship")
-                ProfileInfo(user.following_count.toString(), "Following",navigateToRoute,"relationship")
-            }
-
-        }
-        Text(user.user_name,Modifier.padding(horizontal = 5.dp))
-        Text(user.bio, modifier = Modifier.padding(horizontal = 5.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 3.dp)
-        ) {
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color(3, 109, 202, 201)),
-                modifier = Modifier
-                    .weight(1F)
-                    .padding(end = 2.dp),
-                shape = RoundedCornerShape(25)
-
-            ) {
-                Text("Edit Profile", color = Color.White)
-            }
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color(3, 109, 202, 201)),
-                modifier = Modifier
-                    .weight(1F)
-                    .padding(start = 2.dp),
-                shape = RoundedCornerShape(25)
-
-            ) {
-                Text("Share Profile", color = Color.White)
-            }
-        }
-
-        StoryHighlightsDropDown()
-
-    }
-}
-
-@Composable
-fun PostItem(
-    image: Int,
-    index: Int,
-    showModal: MutableState<Boolean>,
-    modalStartScrollIndex: MutableState<Int>,
-    transformOriginOffset: MutableState<Offset>
-){
-    Image(
-        contentScale = ContentScale.Crop,
-        painter = painterResource(id = image),
-        contentDescription = "",
-        modifier = Modifier
-            .size(150.dp)
-            .clickable {
-                modalStartScrollIndex.value = index
-                showModal.value = true
-            }
-    )
-}
 
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -453,17 +133,23 @@ fun ProfileScreen(
                     enabled = scrollEnabled.value
                 )
         ) {
+
+            //User Profile Header
             ProfileHeader(showBottomSheet, currentBottomSheet)
+
+            //User Profile Info section
             ProfileInfoTab(navigateToRoute = navigateToRoute)
+
+            //UserContentSection
             UserContent(
-                scrollState,
-                postsGridState,
-                reelsGridState,
-                taggedGridState,
-                currentContent,
-                showModal,
-                modalStartScrollIndex,
-                transformOriginOffset
+                showModal = showModal,
+                scrollState = scrollState,
+                postsGridState = postsGridState,
+                reelsGridState = reelsGridState,
+                currentContent = currentContent,
+                taggedGridState = taggedGridState,
+                modalStartScrollIndex = modalStartScrollIndex,
+                transformOriginOffset = transformOriginOffset,
             )
         }
 
@@ -474,12 +160,13 @@ fun ProfileScreen(
             onDraw = {
                 val size = size
                 drawRect(
-                    color = Color.hsv(
+                    size = size,
+                    color = Color(
                         0F,
                         0F,
                         0F,
-                        if(showModal.value) 0.3F else 0.0F),
-                    size = size
+                        if(showModal.value) 0.3F else 0.0F
+                    ),
                 )
             }
         )
@@ -504,11 +191,11 @@ fun ProfileScreen(
 
         ) {
             PostsModal(
-                showModal,
-                modalStartScrollIndex,
-                currentModalSheet,
-                currentBottomSheet,
-                showBottomSheet
+                showModal = showModal,
+                showBottomSheet = showBottomSheet,
+                currentModalSheet = currentModalSheet,
+                currentBottomSheet = currentBottomSheet,
+                modalStartScrollIndex = modalStartScrollIndex,
             )
         }
     }
@@ -518,10 +205,10 @@ fun ProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview(){
-    val appstate = rememberAppState()
+    val appState = rememberAppState()
     InstaCloneApp3Theme() {
         ProfileScreen(
-            appstate::onNavigateToScreen,
+            appState::onNavigateToScreen,
             remember { mutableStateOf(false) },
             remember{ mutableStateOf(BottomSheets.NO_SHEET)},
             remember{ mutableStateOf(ModalSheets.NO_SHEET)}

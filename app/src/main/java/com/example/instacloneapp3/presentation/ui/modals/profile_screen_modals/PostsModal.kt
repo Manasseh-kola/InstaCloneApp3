@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Divider
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -44,10 +46,12 @@ import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostFooter
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostHeader
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostItemPager
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserCaption
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserComment
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -62,7 +66,17 @@ fun PostItem(
     showBottomSheet: MutableState<Boolean>,
 ) {
 
+
+    //Pager state for multiple posts
     val pagerState = rememberPagerState()
+
+    //State of Page count Indicator
+    val isPageCountVisible = remember{ mutableStateOf(true) }
+    LaunchedEffect(key1 = Unit){
+        delay(5000)
+        isPageCountVisible.value = false
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,22 +92,36 @@ fun PostItem(
             modifier = Modifier.fillMaxWidth(),
             currentBottomSheet,
             showBottomSheet
-        )
-        Box(){
-            Image(
-                contentScale = ContentScale.Crop,
-                painter = painterResource(id = post.imageRes),
-                contentDescription = "",
-                modifier = Modifier
-                    .size(450.dp)
+        ){}
 
+        //Posted Content
+        Box(){
+            PostItemPager(
+                postContent = post.mediaContent,
+                pagerState = pagerState
             )
+
+            //PageCount Indicator
+            if(isPageCountVisible.value) {
+                Text(
+                    text = "${pagerState.currentPage + 1}/${post.mediaContent.size}",
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.TopEnd)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.Gray)
+                        .padding(horizontal = 5.dp, vertical = 3.dp)
+                )
+            }
         }
+
         Column(modifier = Modifier.padding(10.dp)){
             PostFooter(
-                currentBottomSheet,
-                showBottomSheet,
-                pagerState
+                currentBottomSheet = currentBottomSheet,
+                pageCount = post.mediaContent.size,
+                showBottomSheet = showBottomSheet,
+                pagerState = pagerState,
             )
             UserCaption(username = post.user_name, caption = post.caption)
             UserComment(showModal, currentModalSheet)
@@ -110,6 +138,7 @@ fun PostsModalHeader(showModal: MutableState<Boolean>) {
         modifier = Modifier
             .fillMaxWidth()
     ){
+        //Back Button
         Icon(
             imageVector = Icons.Default.KeyboardArrowLeft,
             contentDescription = "",
@@ -121,11 +150,12 @@ fun PostsModalHeader(showModal: MutableState<Boolean>) {
                 }
         )
 
+        //User name and Content Category
         Column(
             modifier = Modifier.align(Alignment.Center)
         ) {
-            Text("${user.user_name}")
-            Text("Posts", fontWeight = FontWeight.Bold)
+            Text(text = "${user.user_name}")
+            Text(text = "Posts", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -183,16 +213,14 @@ fun PostsModal(
     ) {
         PostsModalHeader(showModal)
         Divider(Modifier.padding(top = 10.dp))
-        LazyColumn(
-            state = listState
-        ){
+        LazyColumn( state = listState ){
             items(posts){post ->
                 PostItem(
                     post = post,
-                    showModal,
-                    currentModalSheet,
-                    currentBottomSheet,
-                    showBottomSheet,
+                    showModal = showModal,
+                    showBottomSheet = showBottomSheet,
+                    currentModalSheet = currentModalSheet,
+                    currentBottomSheet = currentBottomSheet,
                 )
             }
         }
@@ -205,11 +233,11 @@ fun PostsModal(
 fun PostsModalPreview(){
     InstaCloneApp3Theme() {
         PostsModal(
-            remember{ mutableStateOf(false)},
-            remember{ mutableStateOf(0)},
-            remember{ mutableStateOf(ModalSheets.NO_SHEET)},
-            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
-            remember{ mutableStateOf(false)}
+            showModal = remember{ mutableStateOf(false)},
+            showBottomSheet = remember{ mutableStateOf(false)},
+            modalStartScrollIndex = remember{ mutableStateOf(0)},
+            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
+            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)},
         )
     }
 }
