@@ -1,6 +1,7 @@
 package com.example.instacloneapp3.presentation.ui.screens.profile_screen.content
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -36,9 +37,10 @@ fun ReelsContent(
 
     LazyVerticalGrid(
         state = gridState,
-        //1023
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+        horizontalArrangement = Arrangement.spacedBy(1.dp),
         userScrollEnabled = scrollState.value == scrollState.maxValue,
-        columns = GridCells.Adaptive(minSize = 128.dp)
     ){
         itemsIndexed(posts){ index, post ->
             Column {

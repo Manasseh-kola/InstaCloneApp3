@@ -21,7 +21,7 @@ import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeScreen
 import com.example.instacloneapp3.presentation.ui.screens.MessagesScreen
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileScreen
 import com.example.instacloneapp3.presentation.ui.screens.reels.ReelsScreen
-import com.example.instacloneapp3.presentation.ui.screens.SearchScreen
+import com.example.instacloneapp3.presentation.ui.screens.search_screen.SearchScreen
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipScreen

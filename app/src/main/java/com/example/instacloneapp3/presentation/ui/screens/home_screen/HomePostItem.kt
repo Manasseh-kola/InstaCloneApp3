@@ -78,7 +78,7 @@ fun PostItem(
             )
 
             //PageCount Indicator
-            if(isPageCountVisible.value) {
+            if(isPageCountVisible.value && post.mediaContent.size > 1) {
                 Text(
                     text = "${pagerState.currentPage + 1}/${post.mediaContent.size}",
                     color = Color.White,

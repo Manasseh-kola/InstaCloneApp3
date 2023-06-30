@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.presentation.mock_data.Posts
@@ -52,16 +53,13 @@ import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
-
-
-
-
 @Composable
 fun RelationshipSearchBar(
     input: MutableState<String>,
     placeholder: String,
     leadingIcon: ImageVector = Icons.Default.Search,
-    width: Float = 1f
+    width: Float = 1f,
+    verticalPadding: Dp = 10.dp
 ){
     BasicTextField(
         singleLine = true,
@@ -70,7 +68,7 @@ fun RelationshipSearchBar(
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = verticalPadding)
                     .fillMaxWidth(width)
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color(240, 240, 240))
