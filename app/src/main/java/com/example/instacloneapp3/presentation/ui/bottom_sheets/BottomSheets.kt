@@ -5,12 +5,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bottom_sheets.PostItemMore
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.home_screen_bottom_sheets.ShareContent
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.CreateNewContent
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.manage_account.ManageUserAccount
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account.TryNewAccount
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.users.UsersProfileNotifications
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 enum class BottomSheets {
 
@@ -32,14 +35,14 @@ enum class BottomSheets {
 @Composable
 fun AppBottomSheets(
     sheetState: SheetState,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>
+    navigationViewModel: NavigationViewModel = hiltViewModel<NavigationViewModel>()
 ){
+    val navigationUiState = navigationViewModel.navigationState.collectAsState()
     ModalBottomSheet(
-        onDismissRequest = { showBottomSheet.value = false},
+        onDismissRequest = { navigationViewModel.closeBottomSheet()},
         sheetState = sheetState
     ) {
-        when(currentBottomSheet.value){
+        when(navigationUiState.value.currentBottomSheet){
             BottomSheets.NO_SHEET -> {}
             BottomSheets.TRY_NEW_ACCOUNT -> TryNewAccount()
             BottomSheets.CREATE_NEW_CONTENT -> CreateNewContent()

@@ -5,9 +5,10 @@ import androidx.compose.runtime.MutableState
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
-import com.example.instacloneapp3.presentation.ui.screens.NotificationsScreen
+import com.example.instacloneapp3.presentation.ui.screens.notifications_screen.NotificationsScreen
 import com.example.instacloneapp3.presentation.ui.screens.favourites_screen.FavouritesScreen
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.users.UsersProfileScreen
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 enum class HomeModals{
     NO_SCREEN,
@@ -25,10 +26,7 @@ fun HomeModalScreens(
     currentHomeModal: MutableState<HomeModals>,
     showHomeModal: MutableState<Boolean>,
     navigateToRoute: (String) -> Unit,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    currentModalSheet: MutableState<ModalSheets>,
-    currentUser: MutableState<Posts>
+    navigationViewModel: NavigationViewModel,
 ){
     when(currentHomeModal.value){
         HomeModals.NOTIFICATIONS_SCREEN -> {
@@ -43,13 +41,9 @@ fun HomeModalScreens(
         }
         HomeModals.USERS_PROFILE_SCREEN -> {
             UsersProfileScreen(
+                navigationViewModel = navigationViewModel,
                 navigateToRoute = navigateToRoute,
-                showBottomSheet = showBottomSheet,
-                currentBottomSheet = currentBottomSheet,
-                currentModalSheet = currentModalSheet,
-                currentHomeModal = currentHomeModal,
                 showHomeModal = showHomeModal,
-                currentUser = currentUser
             )
         }
         HomeModals.FOLLOWING -> {}

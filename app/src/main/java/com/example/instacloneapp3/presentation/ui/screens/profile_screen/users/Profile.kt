@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,13 +55,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeModals
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.LikedBy
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.SuggestedForYou
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImageModifier
@@ -69,23 +70,20 @@ import com.example.instacloneapp3.presentation.ui.screens.profile_screen.content
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileInfo
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.StoryHighlightItem
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 
 @Composable
 fun UsersProfileScreen(
     navigateToRoute: (String) -> Unit,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    currentModalSheet: MutableState<ModalSheets>,
-    profile1Owner: Posts = PostsRepo().getPosts()[0],
-    currentHomeModal: MutableState<HomeModals>,
     showHomeModal: MutableState<Boolean>,
-    currentUser: MutableState<Posts>
+    navigationViewModel: NavigationViewModel
 ){
-    var userIndex = PostsRepo().getPosts().indexOfFirst{ it.user_name == currentUser.value.user_name}
+    val navigationUiState = navigationViewModel.navigationState.collectAsState()
+    val currentUser = navigationUiState.value.currentUser!!
+    val userIndex = PostsRepo().getPosts().indexOfFirst{ it.user_name == currentUser.user_name}
 
 
-    val profileOwner = currentUser.value
     val configuration = LocalConfiguration.current
     val scrollState = rememberScrollState()
     val postsGridState = rememberLazyGridState()
@@ -128,7 +126,7 @@ fun UsersProfileScreen(
         }
     }
 
-    Log.i("scrollstate", "${scrollState.value}  ${scrollState.maxValue}")
+    Log.i("scrollState", "${scrollState.value}  ${scrollState.maxValue}")
 
     Box(
         modifier = Modifier.background(Color.White)
@@ -144,16 +142,15 @@ fun UsersProfileScreen(
         ){
 
             ProfileHeader(
-                showBottomSheet,
-                currentBottomSheet,
-                profileOwner.user_name
+                navigationViewModel = navigationViewModel,
+                userName = currentUser.user_name
             ){showHomeModal.value = false}
 
             ProfileInfoTab(
-                profileOwner = profileOwner,
+                userIndex = userIndex,
+                profileOwner = currentUser,
                 navigateToRoute = navigateToRoute,
                 suggestionDropDown = suggestionDropDown,
-                userIndex = userIndex
 
             )
 
@@ -165,14 +162,14 @@ fun UsersProfileScreen(
             StoryHighlights()
 
             UserContent(
-                scrollState,
-                postsGridState,
-                reelsGridState,
-                taggedGridState,
-                currentContent,
-                showModal,
-                modalStartScrollIndex,
-                transformOriginOffset
+                showModal = showModal,
+                scrollState = scrollState,
+                postsGridState = postsGridState,
+                reelsGridState = reelsGridState,
+                currentContent = currentContent,
+                taggedGridState = taggedGridState,
+                modalStartScrollIndex = modalStartScrollIndex,
+                transformOriginOffset = transformOriginOffset
             )
 
         }
@@ -184,9 +181,9 @@ fun UsersProfileScreen(
 fun StoryHighlights() {
     val stories = StoriesRepo().getStories()
     LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(10.dp),
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ){
         items(stories){story->
             StoryHighlightItem(story = story)
@@ -198,8 +195,7 @@ fun StoryHighlights() {
 
 @Composable
 fun ProfileHeader(
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
+    navigationViewModel: NavigationViewModel,
     userName: String,
     hideModal: ()-> Unit
 ) {
@@ -220,9 +216,9 @@ fun ProfileHeader(
         )
 
         Text(
-            text = "$userName",
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
+            text = userName,
             modifier = Modifier
                 .align(Alignment.Center)
         )
@@ -238,8 +234,10 @@ fun ProfileHeader(
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
-                        currentBottomSheet.value = BottomSheets.USERS_PROFILE_NOTIFICATIONS
-                        showBottomSheet.value = true
+                        navigationViewModel.openBottomSheet(
+                            currentBottomSheet = BottomSheets.USERS_PROFILE_NOTIFICATIONS,
+                            currentScreen = AppScreenTypes.UsersProfile
+                        )
                     }
             )
 
@@ -311,11 +309,13 @@ fun ProfileInfoTab(
         ) {
             LikedBy(
                 imageSize = 35.dp,
+                borderWidth = 4.dp,
                 imageSpacing = 50.dp,
-                borderWidth = 4.dp
             )
+
             Spacer(Modifier.width(10.dp))
-            Column(){
+
+            Column {
                 Text(
                     text = buildAnnotatedString {
                         append("Followed by ")
@@ -323,7 +323,7 @@ fun ProfileInfoTab(
                             append("${followers[0].user_name}, ")
                         }
                         withStyle(style = SpanStyle(fontWeight = FontWeight(800))){
-                            append("${followers[1].user_name}")
+                            append(followers[1].user_name)
                         }
                      },
                     overflow = TextOverflow.Ellipsis,
@@ -408,15 +408,11 @@ fun ProfileInfoTab(
 @Preview(showBackground = true)
 fun UsersProfileScreenPreview(){
     val appState = rememberAppState()
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         UsersProfileScreen(
+            navigationViewModel = hiltViewModel(),
             navigateToRoute = appState::onNavigateToScreen,
-            showBottomSheet = remember{ mutableStateOf(false)},
-            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)},
-            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
-            currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)},
             showHomeModal = remember{ mutableStateOf(false)},
-            currentUser = remember{ mutableStateOf(PostsRepo().getPosts()[0])}
         )
     }
 }

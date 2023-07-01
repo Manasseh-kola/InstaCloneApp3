@@ -22,11 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -35,11 +37,9 @@ fun PostItem(
     post: Posts,
     showModal: MutableState<Boolean>,
     currentModalSheet: MutableState<ModalSheets>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>,
     currentHomeModal: MutableState<HomeModals>,
     showHomeModal: MutableState<Boolean>,
-    currentUser: MutableState<Posts>
+    navigationViewModel: NavigationViewModel
 ) {
 
     //Pager state for multiple posts
@@ -60,12 +60,11 @@ fun PostItem(
         // Header containing User profile and name
         PostHeader(
             user_name = post.user_name,
-            showBottomSheet = showBottomSheet,
             modifier = Modifier.fillMaxWidth(),
             profile_picture = post.profile_picture,
-            currentBottomSheet = currentBottomSheet,
+            navigationViewModel = navigationViewModel
         ){
-            currentUser.value = post
+            navigationViewModel.addCurrentUser(post)
             currentHomeModal.value = HomeModals.USERS_PROFILE_SCREEN
             showHomeModal.value = true
         }
@@ -95,9 +94,8 @@ fun PostItem(
         //Post Footer and Comment section
         Column(modifier = Modifier.padding(10.dp)){
             PostFooter(
-                currentBottomSheet = currentBottomSheet,
+                navigationViewModel = navigationViewModel,
                 pageCount = post.mediaContent.size,
-                showBottomSheet = showBottomSheet,
                 pagerState = pagerState,
 
             )
@@ -116,13 +114,11 @@ fun PostItemPreview(){
     InstaCloneApp3Theme() {
         PostItem(
             post = PostsRepo().getPosts()[0],
+            navigationViewModel = hiltViewModel(),
             showModal=  remember{ mutableStateOf(false)},
-            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
-            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)},
-            showBottomSheet =  remember{ mutableStateOf(false)},
-            currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)},
             showHomeModal =  remember{ mutableStateOf(false)},
-            currentUser = remember{ mutableStateOf(PostsRepo().getPosts()[0])}
+            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
+            currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)},
         )
     }
 }

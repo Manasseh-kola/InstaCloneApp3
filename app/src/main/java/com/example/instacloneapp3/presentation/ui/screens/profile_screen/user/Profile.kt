@@ -58,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.mock_data.Stories
 import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
@@ -69,17 +70,16 @@ import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImage
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.content.UserContent
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-
-
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProfileScreen(
     navigateToRoute: (String) -> Unit,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    currentModalSheet: MutableState<ModalSheets>,) {
+    currentModalSheet: MutableState<ModalSheets>,
+    navigationViewModel: NavigationViewModel,
+) {
 
 
     val scrollState = rememberScrollState()
@@ -135,7 +135,7 @@ fun ProfileScreen(
         ) {
 
             //User Profile Header
-            ProfileHeader(showBottomSheet, currentBottomSheet)
+            ProfileHeader(navigationViewModel = navigationViewModel)
 
             //User Profile Info section
             ProfileInfoTab(navigateToRoute = navigateToRoute)
@@ -192,10 +192,10 @@ fun ProfileScreen(
         ) {
             PostsModal(
                 showModal = showModal,
-                showBottomSheet = showBottomSheet,
                 currentModalSheet = currentModalSheet,
-                currentBottomSheet = currentBottomSheet,
+                navigationViewModel = navigationViewModel,
                 modalStartScrollIndex = modalStartScrollIndex,
+
             )
         }
     }
@@ -208,10 +208,9 @@ fun ProfileScreenPreview(){
     val appState = rememberAppState()
     InstaCloneApp3Theme() {
         ProfileScreen(
-            appState::onNavigateToScreen,
-            remember { mutableStateOf(false) },
-            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
-            remember{ mutableStateOf(ModalSheets.NO_SHEET)}
+            navigationViewModel = hiltViewModel(),
+            navigateToRoute = appState::onNavigateToScreen,
+            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)}
         )
     }
 }

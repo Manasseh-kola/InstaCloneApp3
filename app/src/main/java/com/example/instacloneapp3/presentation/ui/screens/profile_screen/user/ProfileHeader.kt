@@ -24,10 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 /*
 User Profile Header
@@ -36,8 +39,7 @@ User Profile Header
 @Composable
 fun ProfileDropDown(
     username: String,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>
+    navigationViewModel: NavigationViewModel,
 ){
     Row{
         //User Name
@@ -54,8 +56,10 @@ fun ProfileDropDown(
             contentDescription = "",
             modifier = Modifier
                 .clickable{
-                currentBottomSheet.value = BottomSheets.TRY_NEW_ACCOUNT
-                showBottomSheet.value = true
+                    navigationViewModel.openBottomSheet(
+                        currentBottomSheet = BottomSheets.TRY_NEW_ACCOUNT,
+                        currentScreen = AppScreenTypes.Profile
+                    )
             }
         )
 
@@ -64,8 +68,7 @@ fun ProfileDropDown(
 
 @Composable
 fun ProfileHeader(
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>
+    navigationViewModel: NavigationViewModel
 ) {
 
     //ProfileHeader Root Composable
@@ -78,9 +81,8 @@ fun ProfileHeader(
     ){
         //User name and DropDown Arrow
         ProfileDropDown(
+            navigationViewModel = navigationViewModel,
             username = user.user_name,
-            showBottomSheet = showBottomSheet,
-            currentBottomSheet = currentBottomSheet
         )
 
 
@@ -96,8 +98,10 @@ fun ProfileHeader(
                 modifier = Modifier
                     .size(18.dp)
                     .clickable {
-                        currentBottomSheet.value = BottomSheets.CREATE_NEW_CONTENT
-                        showBottomSheet.value = true
+                        navigationViewModel.openBottomSheet(
+                            currentBottomSheet = BottomSheets.CREATE_NEW_CONTENT,
+                            currentScreen = AppScreenTypes.Profile
+                        )
                     }
             )
             Spacer(Modifier.width(20.dp))
@@ -108,8 +112,10 @@ fun ProfileHeader(
                 contentDescription = "",
                 modifier = Modifier
                     .clickable {
-                        currentBottomSheet.value = BottomSheets.MANAGE_USER_ACCOUNT
-                        showBottomSheet.value = true
+                        navigationViewModel.openBottomSheet(
+                            currentBottomSheet = BottomSheets.MANAGE_USER_ACCOUNT,
+                            currentScreen = AppScreenTypes.Profile
+                        )
                     }
             )
         }
@@ -122,8 +128,7 @@ fun ProfileHeader(
 fun ProfileHeaderPreview(){
     InstaCloneApp3Theme() {
         ProfileHeader(
-            showBottomSheet = remember{ mutableStateOf(false)},
-            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)}
+            navigationViewModel = hiltViewModel()
         )
     }
 }

@@ -7,18 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.AddCircle
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -26,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +21,6 @@ import androidx.navigation.NavBackStackEntry
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-
 
 sealed class NavBarScreen(
     val route: String,
@@ -69,13 +55,13 @@ fun NavBarItem(
             contentDescription = "",
             modifier = Modifier
                 .size(27.dp)
-                .clickable(onClick = {
-                    onNavigate(route)
-                    currentRoute.value = route
-                }
+                .clickable(
+                    onClick = {
+                        onNavigate(route)
+                        currentRoute.value = route
+                    }
                 )
         )
-
 }
 
 @Composable

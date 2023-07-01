@@ -6,4 +6,5 @@ sealed class AppScreenTypes(val name: String) {
     object New: AppScreenTypes("newPost")
     object Reels: AppScreenTypes("reels")
     object Profile: AppScreenTypes("profile")
+    object UsersProfile: AppScreenTypes("usersProfile")
 }

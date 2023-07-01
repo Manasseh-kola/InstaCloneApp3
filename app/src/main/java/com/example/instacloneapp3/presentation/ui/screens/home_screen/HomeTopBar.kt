@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.R
-import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 
@@ -29,9 +28,6 @@ Home Feed Screen top bar
 @Composable
 fun TopBar(
     navigateToRoute: (String) -> Unit,
-    backNavigation: (String, String) -> Unit,
-    modalVisible: MutableState<Boolean>,
-    currentModalSheet: MutableState<ModalSheets>,
     currentHomeModal: MutableState<HomeModals>,
     showModal: () -> Unit
 ) {
@@ -92,14 +88,11 @@ fun TopBar(
 @Composable
 @Preview(showBackground = true)
 fun TopBarPreview(){
-    val appstate = rememberAppState()
-    InstaCloneApp3Theme() {
+    val appState = rememberAppState()
+    InstaCloneApp3Theme {
         TopBar(
-            appstate::onNavigateToScreen,
-            appstate::backNavigation,
-            remember{ mutableStateOf(false)},
-            remember{ mutableStateOf(ModalSheets.NO_SHEET)},
-            remember{ mutableStateOf(HomeModals.NO_SCREEN)}
+            navigateToRoute = appState::onNavigateToScreen,
+            currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)},
         ){}
     }
 }

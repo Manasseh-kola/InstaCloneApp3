@@ -18,15 +18,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -40,17 +38,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.mock_data.User
-import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
+
+val user = User()
 
 val storyImageModifier = Modifier
     .size(90.dp)
     .clip(CircleShape)
+
 
 val colorStops = arrayOf(
     0.0f to Color(0xFFd71069),
@@ -62,13 +64,10 @@ val colorStops = arrayOf(
 fun StoriesList(
     user: User,
     stories: List<Posts>,
-    modifier: Modifier,
+    showModal: MutableState<Boolean>,
     navigateToRoute: (String) -> Unit,
     currentModalSheet: MutableState<ModalSheets>,
-    drawerState: DrawerState,
-    showModal: MutableState<Boolean>,
 ) {
-
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -77,9 +76,7 @@ fun StoriesList(
     ) {
         item{
             //Add Story
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box {
                     //User Profile image
                     Image(
@@ -91,15 +88,13 @@ fun StoriesList(
                                 currentModalSheet.value = ModalSheets.STORY_MODAL
                                 showModal.value = true
                             }
-
-
                     )
 
                     //Add Button
                     Icon(
                         imageVector = Icons.Outlined.AddCircle,
-                        contentDescription = "",
                         tint = Color(3, 140, 202, 255),
+                        contentDescription = "",
                         modifier = Modifier
                             .offset(y = 8.dp)
                             .clip(CircleShape)
@@ -135,24 +130,17 @@ fun StoriesList(
 }
 
 
-
 @Composable
 fun PostsList(
-    posts: List<Posts>,
-    feeds:MutableList<Pair<Posts, Int>>,
-    modifier: Modifier,
-    navigateToRoute: (String) -> Unit,
-    backNavigation: (String, String) -> Unit,
-    currentModalSheet: MutableState<ModalSheets>,
-    drawerState: DrawerState,
     showModal: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>,
+    navigateToRoute: (String) -> Unit,
     showHomeModal: MutableState<Boolean>,
+    navigationViewModel: NavigationViewModel,
     currentHomeModal: MutableState<HomeModals>,
-    currentUser: MutableState<Posts>
+    currentModalSheet: MutableState<ModalSheets>,
 ) {
 
+    val posts = PostsRepo().getPosts()
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(5.dp),
@@ -162,12 +150,8 @@ fun PostsList(
 
             //Home Screen Top Bar
             TopBar(
-                modalVisible = showModal,
-                backNavigation = backNavigation,
                 navigateToRoute = navigateToRoute,
                 currentHomeModal = currentHomeModal,
-                currentModalSheet = currentModalSheet,
-
             ){
                 showHomeModal.value = true
             }
@@ -177,84 +161,60 @@ fun PostsList(
                 user = User(),
                 stories = posts,
                 showModal = showModal,
-                drawerState = drawerState,
                 navigateToRoute = navigateToRoute,
-                modifier = Modifier.fillMaxWidth(),
                 currentModalSheet = currentModalSheet,
             )
             Divider()
         }
 
         //Posts/Feeds LazyList
-        items(feeds){feed ->
+        itemsIndexed(posts + posts){ index, feed ->
 
-            when(feed.second) {
-                0 -> {
+            when(index) {
+                3 -> SuggestedReels()
+                10 -> SuggestedForYou()
+                else -> {
                     PostItem(
-                        post = feed.first,
+                        post = feed,
                         showModal = showModal,
-                        currentUser = currentUser,
                         showHomeModal = showHomeModal,
-                        showBottomSheet = showBottomSheet,
                         currentHomeModal = currentHomeModal,
                         currentModalSheet = currentModalSheet,
-                        currentBottomSheet = currentBottomSheet,
+                        navigationViewModel = navigationViewModel,
                     )
                 }
-
-                1-> SuggestedReels()
-                2-> SuggestedForYou()
             }
         }
     }
 }
 
-val user = User()
+
 
 /*
 Home Screen
  */
+
 @Composable
 fun HomeScreen(
     navigateToRoute: (String) -> Unit,
-    backNavigation: (String, String) -> Unit,
-    currentModalSheet: MutableState<ModalSheets>,
-    drawerState: DrawerState,
     modalState: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>,
+    navigationViewModel: NavigationViewModel,
+    currentModalSheet: MutableState<ModalSheets>,
     ) {
 
-    val posts = PostsRepo()
+
     val showHomeModal = remember{ mutableStateOf(false)}
-    val currentUser = remember{ mutableStateOf(posts.getPosts()[0])}
     val currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)}
 
-
-    //Add tag to feeds to display Suggested Reels and Accounts
-    val feeds = mutableListOf<Pair<Posts, Int>>()
-    posts.getPosts().forEach { feeds.add(Pair(it, 0)) }
-    feeds.addAll(feeds)
-    feeds[3] = Pair(feeds[0].first, 1)
-    feeds[10] = Pair(feeds[0].first, 2)
-
-
-    Box(){
+    Box{
         Column(modifier = Modifier.fillMaxSize()) {
             PostsList(
-                feeds = feeds,
                 showModal = modalState,
-                posts = posts.getPosts(),
-                drawerState = drawerState,
-                currentUser = currentUser,
                 showHomeModal = showHomeModal,
-                backNavigation = backNavigation,
-                showBottomSheet = showBottomSheet,
                 navigateToRoute = navigateToRoute,
-                modifier = Modifier.fillMaxWidth(),
                 currentHomeModal = currentHomeModal,
                 currentModalSheet = currentModalSheet,
-                currentBottomSheet = currentBottomSheet,
+                navigationViewModel = navigationViewModel,
             )
         }
 
@@ -264,13 +224,10 @@ fun HomeScreen(
             exit = slideOutHorizontally()
         ) {
             HomeModalScreens(
-                currentUser = currentUser,
                 showHomeModal = showHomeModal,
-                showBottomSheet = showBottomSheet,
                 navigateToRoute = navigateToRoute,
                 currentHomeModal = currentHomeModal,
-                currentModalSheet = currentModalSheet,
-                currentBottomSheet = currentBottomSheet,
+                navigationViewModel = navigationViewModel,
             )
         }
     }
@@ -280,16 +237,13 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreen1Preview() {
-    val appstate = rememberAppState()
-    InstaCloneApp3Theme() {
+    val appState = rememberAppState()
+    InstaCloneApp3Theme {
         HomeScreen(
-            appstate::onNavigateToScreen,
-            appstate::backNavigation,
-            remember{ mutableStateOf(ModalSheets.NO_SHEET) },
-            rememberDrawerState(initialValue = DrawerValue.Closed),
-            remember{ mutableStateOf(false)},
-            remember{ mutableStateOf(BottomSheets.NO_SHEET)},
-            remember{ mutableStateOf(false)}
+            navigationViewModel = hiltViewModel(),
+            modalState = remember{ mutableStateOf(false)},
+            navigateToRoute = appState::onNavigateToScreen,
+            currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
         )
     }
 }

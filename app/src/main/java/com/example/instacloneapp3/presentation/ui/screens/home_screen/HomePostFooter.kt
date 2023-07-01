@@ -22,10 +22,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account.PagerIndicator
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 /*
 Home Post Footer
@@ -37,8 +40,7 @@ Contains
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostFooter(
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>,
+    navigationViewModel: NavigationViewModel,
     pagerState: PagerState,
     pageCount: Int = 0
 ) {
@@ -82,8 +84,10 @@ fun PostFooter(
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-                        currentBottomSheet.value = BottomSheets.SHARE_CONTENT
-                        showBottomSheet.value = true
+                        navigationViewModel.openBottomSheet(
+                            currentBottomSheet = BottomSheets.SHARE_CONTENT,
+                            currentScreen = AppScreenTypes.Home,
+                        )
                     }
             )
         }
@@ -121,8 +125,8 @@ fun PostFooter(
 fun PostFooterPreview(){
     InstaCloneApp3Theme() {
         PostFooter(
-            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)} ,
-            showBottomSheet = remember{ mutableStateOf(false)},
-            pagerState = rememberPagerState() )
+            pagerState = rememberPagerState(),
+            navigationViewModel = hiltViewModel(),
+        )
     }
 }

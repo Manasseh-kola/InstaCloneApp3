@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
@@ -51,6 +52,7 @@ import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserCaptio
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.UserComment
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -62,8 +64,7 @@ fun PostItem(
     post: Posts,
     showModal: MutableState<Boolean>,
     currentModalSheet: MutableState<ModalSheets>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>,
+    navigationViewModel: NavigationViewModel
 ) {
 
 
@@ -87,11 +88,11 @@ fun PostItem(
     ){
 
         PostHeader(
-            post.profile_picture,
-            post.user_name,
+            navigationViewModel = navigationViewModel,
+            profile_picture = post.profile_picture,
             modifier = Modifier.fillMaxWidth(),
-            currentBottomSheet,
-            showBottomSheet
+            user_name = post.user_name,
+
         ){}
 
         //Posted Content
@@ -118,9 +119,8 @@ fun PostItem(
 
         Column(modifier = Modifier.padding(10.dp)){
             PostFooter(
-                currentBottomSheet = currentBottomSheet,
+                navigationViewModel = navigationViewModel,
                 pageCount = post.mediaContent.size,
-                showBottomSheet = showBottomSheet,
                 pagerState = pagerState,
             )
             UserCaption(username = post.user_name, caption = post.caption)
@@ -165,8 +165,7 @@ fun PostsModal(
     showModal: MutableState<Boolean>,
     modalStartScrollIndex: MutableState<Int>,
     currentModalSheet: MutableState<ModalSheets>,
-    currentBottomSheet: MutableState<BottomSheets>,
-    showBottomSheet: MutableState<Boolean>
+    navigationViewModel: NavigationViewModel
 ) {
     val list1 = PostsRepo().getPosts()
     val posts = list1 + list1 + list1
@@ -218,9 +217,8 @@ fun PostsModal(
                 PostItem(
                     post = post,
                     showModal = showModal,
-                    showBottomSheet = showBottomSheet,
                     currentModalSheet = currentModalSheet,
-                    currentBottomSheet = currentBottomSheet,
+                    navigationViewModel = navigationViewModel
                 )
             }
         }
@@ -233,11 +231,10 @@ fun PostsModal(
 fun PostsModalPreview(){
     InstaCloneApp3Theme() {
         PostsModal(
+            navigationViewModel = hiltViewModel(),
             showModal = remember{ mutableStateOf(false)},
-            showBottomSheet = remember{ mutableStateOf(false)},
             modalStartScrollIndex = remember{ mutableStateOf(0)},
             currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)},
-            currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)},
         )
     }
 }

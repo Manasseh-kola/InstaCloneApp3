@@ -18,7 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.HomeScreen
-import com.example.instacloneapp3.presentation.ui.screens.MessagesScreen
+import com.example.instacloneapp3.presentation.ui.screens.messages_screen.MessagesScreen
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileScreen
 import com.example.instacloneapp3.presentation.ui.screens.reels.ReelsScreen
 import com.example.instacloneapp3.presentation.ui.screens.search_screen.SearchScreen
@@ -26,6 +26,7 @@ import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipScreen
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.users.UsersRelationShipScreen
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 
 sealed class Screen(val route: String, val icon : ImageVector) {
@@ -44,28 +45,23 @@ sealed class Screen(val route: String, val icon : ImageVector) {
 fun NavGraphBuilder.authenticatedGraph(
     navigateToRoute: (String) -> Unit,
     backNavigation: (String, String) -> Unit,
-    showBottomSheet: MutableState<Boolean>,
-    currentBottomSheet: MutableState<BottomSheets>,
     currentModalSheet: MutableState<ModalSheets>,
-    drawerState: DrawerState,
     modalState: MutableState<Boolean>,
+    navigationViewModel: NavigationViewModel
 ){
     navigation(startDestination = "home", route = "authenticated"){
         composable(Screen.Home.route){
             HomeScreen(
-                navigateToRoute,
-                backNavigation,
-                currentModalSheet,
-                drawerState,
-                modalState,
-                currentBottomSheet,
-                showBottomSheet
+                modalState = modalState,
+                navigateToRoute = navigateToRoute,
+                currentModalSheet = currentModalSheet,
+                navigationViewModel = navigationViewModel
             )
         }
         composable(Screen.Search.route){ SearchScreen() }
         composable(Screen.New.route){ Row(){ Text(text = "Add new") } }
         composable(Screen.Reels.route){ ReelsScreen(navigateToRoute,backNavigation) }
-        composable(Screen.Profile.route){ ProfileScreen(navigateToRoute, showBottomSheet, currentBottomSheet, currentModalSheet) }
+        composable(Screen.Profile.route){ ProfileScreen(navigateToRoute, currentModalSheet, navigationViewModel) }
         composable(Screen.Messages.route){ MessagesScreen(backNavigation, navigateToRoute) }
         composable(
             Screen.Relationship.route,

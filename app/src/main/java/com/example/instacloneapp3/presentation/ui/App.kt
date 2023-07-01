@@ -14,12 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
-//import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
-//import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,19 +28,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.instacloneapp3.presentation.ui.navigation.components.InstagramCloneNavBar
 import com.example.instacloneapp3.presentation.ui.navigation.graphs.Screen
 import com.example.instacloneapp3.presentation.ui.navigation.graphs.authenticatedGraph
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.AppBottomSheets
-import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.AppModalSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.comments_screen.CommentScreen
 import com.example.instacloneapp3.presentation.ui.screens.direct_message_screen.DirectMessageScreen
 import com.example.instacloneapp3.presentation.ui.screens.story_screen.StoryListScreen
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 val tabs = listOf(
     Screen.Home,
@@ -61,24 +61,23 @@ val homeTabs = setOf(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun App() {
+fun App(
+    navigationViewModel: NavigationViewModel = hiltViewModel()
+) {
     val appState = rememberAppState()
     val navController = appState.navController
     val modalState = appState.modalState
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
-    val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
-    val showBottomSheet = remember { mutableStateOf(false) }
-    val currentBottomSheet = remember{ mutableStateOf(BottomSheets.NO_SHEET)}
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val currentModalSheet = remember{ mutableStateOf(ModalSheets.NO_SHEET)}
+    val navigationUiState = navigationViewModel.navigationState.collectAsState()
+
 
     Box(
         modifier = Modifier.fillMaxSize()
     ){
-
         //Navigation
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -113,23 +112,17 @@ fun App() {
                         .padding(innerPadding)
                 ) {
                     authenticatedGraph(
-                        appState::onNavigateToScreen,
-                        appState::backNavigation,
-                        showBottomSheet,
-                        currentBottomSheet,
-                        currentModalSheet,
-                        drawerState,
-                        modalState
+                        navigateToRoute = appState::onNavigateToScreen,
+                        navigationViewModel = navigationViewModel,
+                        backNavigation = appState::backNavigation,
+                        currentModalSheet = currentModalSheet,
+                        modalState = modalState,
                     )
                 }
 
-
-                if (showBottomSheet.value) {
-                    AppBottomSheets(
-                        sheetState = sheetState,
-                        showBottomSheet = showBottomSheet,
-                        currentBottomSheet = currentBottomSheet
-                    )
+                //Bottom Sheets
+                if (navigationUiState.value.showBottomSheet) {
+                    AppBottomSheets(sheetState = sheetState)
                 }
             }
         }
