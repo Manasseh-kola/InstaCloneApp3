@@ -8,17 +8,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 /*
 Home Feed Screen top bar
@@ -28,8 +28,7 @@ Home Feed Screen top bar
 @Composable
 fun TopBar(
     navigateToRoute: (String) -> Unit,
-    currentHomeModal: MutableState<HomeModals>,
-    showModal: () -> Unit
+    navigationViewModel: NavigationViewModel,
 ) {
 
     //Top Bar root composable
@@ -42,14 +41,11 @@ fun TopBar(
 
         //Instagram Logo and Feeds Dropdown menu
         DropDown(
-            Modifier
+            navigationViewModel = navigationViewModel,
+            modifier = Modifier
                 .height(45.dp)
                 .weight(4F),
-            currentHomeModal
-        ){
-            currentHomeModal.value = HomeModals.FAVOURITES_SCREEN
-            showModal()
-        }
+        )
 
         //Top Bar Icons
         Row(
@@ -65,8 +61,7 @@ fun TopBar(
                     .size(25.dp)
                     .weight(1F)
                     .clickable {
-                        currentHomeModal.value = HomeModals.NOTIFICATIONS_SCREEN
-                        showModal()
+                        navigationViewModel.addRouteToBackStack(AppScreens.Notifications)
                     }
             )
 
@@ -91,8 +86,8 @@ fun TopBarPreview(){
     val appState = rememberAppState()
     InstaCloneApp3Theme {
         TopBar(
+            navigationViewModel = hiltViewModel(),
             navigateToRoute = appState::onNavigateToScreen,
-            currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)},
-        ){}
+            )
     }
 }

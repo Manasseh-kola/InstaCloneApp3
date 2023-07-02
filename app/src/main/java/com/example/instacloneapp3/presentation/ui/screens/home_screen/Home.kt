@@ -1,8 +1,6 @@
 package com.example.instacloneapp3.presentation.ui.screens.home_screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -134,9 +132,7 @@ fun StoriesList(
 fun PostsList(
     showModal: MutableState<Boolean>,
     navigateToRoute: (String) -> Unit,
-    showHomeModal: MutableState<Boolean>,
     navigationViewModel: NavigationViewModel,
-    currentHomeModal: MutableState<HomeModals>,
     currentModalSheet: MutableState<ModalSheets>,
 ) {
 
@@ -151,10 +147,8 @@ fun PostsList(
             //Home Screen Top Bar
             TopBar(
                 navigateToRoute = navigateToRoute,
-                currentHomeModal = currentHomeModal,
-            ){
-                showHomeModal.value = true
-            }
+                navigationViewModel = navigationViewModel,
+            )
 
             //Story LazyList
             StoriesList(
@@ -177,8 +171,6 @@ fun PostsList(
                     PostItem(
                         post = feed,
                         showModal = showModal,
-                        showHomeModal = showHomeModal,
-                        currentHomeModal = currentHomeModal,
                         currentModalSheet = currentModalSheet,
                         navigationViewModel = navigationViewModel,
                     )
@@ -203,30 +195,12 @@ fun HomeScreen(
     ) {
 
 
-    val showHomeModal = remember{ mutableStateOf(false)}
-    val currentHomeModal = remember{ mutableStateOf(HomeModals.NO_SCREEN)}
-
     Box{
         Column(modifier = Modifier.fillMaxSize()) {
             PostsList(
                 showModal = modalState,
-                showHomeModal = showHomeModal,
                 navigateToRoute = navigateToRoute,
-                currentHomeModal = currentHomeModal,
                 currentModalSheet = currentModalSheet,
-                navigationViewModel = navigationViewModel,
-            )
-        }
-
-        AnimatedVisibility(
-            visible = showHomeModal.value,
-            enter = slideInHorizontally(),
-            exit = slideOutHorizontally()
-        ) {
-            HomeModalScreens(
-                showHomeModal = showHomeModal,
-                navigateToRoute = navigateToRoute,
-                currentHomeModal = currentHomeModal,
                 navigationViewModel = navigationViewModel,
             )
         }

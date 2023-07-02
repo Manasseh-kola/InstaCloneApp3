@@ -45,11 +45,11 @@ import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class Screens{
-    object Mutual: Screens()
-    object Followers: Screens()
-    object Following: Screens()
-    object SuggestedForYou: Screens()
+sealed class Screens(val name: String){
+    object Mutual: Screens("Mutual")
+    object Followers: Screens("Followers")
+    object Following: Screens("Following")
+    object SuggestedForYou: Screens("For you")
 
 }
 
@@ -78,26 +78,6 @@ fun RelationshipHeader(
     coroutineScope: CoroutineScope,
     user: Posts,
 ){
-
-    val page0Color =  animateColorAsState(
-        if(pagerState.currentPage == 0) Color.Black
-        else Color.Gray
-    )
-
-    val page1Color =  animateColorAsState(
-        if(pagerState.currentPage == 1) Color.Black
-        else Color.Gray
-    )
-
-    val page2Color =  animateColorAsState(
-        if(pagerState.currentPage == 2) Color.Black
-        else Color.Gray
-    )
-
-    val page3Color =  animateColorAsState(
-        if(pagerState.currentPage == 3) Color.Black
-        else Color.Gray
-    )
 
     fun onClick(page:Int) {
         coroutineScope.launch {
@@ -132,32 +112,16 @@ fun RelationshipHeader(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
         ){
-            Text(
-                color = page0Color.value,
-                fontWeight = FontWeight(500),
-                text = "Mutual",
-                modifier = Modifier.clickable(onClick = { onClick(0)})
-            )
-            Text(
-                color = page1Color.value,
-                fontWeight = FontWeight(500),
-                text = "${(0..200).random()} Followers",
-                modifier = Modifier.clickable(onClick = { onClick(1)})
-            )
-            Text(
-                color = page2Color.value,
-                fontWeight = FontWeight(500),
-                text = "${(0..200).random()} Following",
-                modifier = Modifier.clickable(onClick = { onClick(2)})
-            )
-            Text(
-                color = page3Color.value,
-                fontWeight = FontWeight(500),
-                text = "For you",
-                modifier = Modifier.clickable(onClick = { onClick(3)})
-            )
 
-
+            screens.forEachIndexed{ page, screen ->
+                Text(
+                    color = if(pagerState.currentPage == page) Color.Black else Color.Gray,
+                    fontWeight = FontWeight(500),
+                    text = screen.name,
+                    modifier = Modifier
+                        .clickable{ onClick(page)}
+                )
+            }
         }
     }
 }

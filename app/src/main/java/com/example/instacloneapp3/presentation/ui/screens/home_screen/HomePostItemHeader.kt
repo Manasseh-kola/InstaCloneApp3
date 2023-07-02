@@ -15,10 +15,6 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
@@ -40,7 +35,6 @@ Home Post Item Header
 fun PostHeader(
     profile_picture: Int,
     user_name: String,
-    modifier: Modifier,
     navigationViewModel:NavigationViewModel,
     onclick: ()-> Unit
 ){
@@ -85,7 +79,7 @@ fun PostHeader(
             modifier = Modifier.clickable {
                 navigationViewModel.openBottomSheet(
                     BottomSheets.POST_ITEM_MORE,
-                    AppScreenTypes.Home,
+                    AppScreens.Home,
                 )
             }
         )
@@ -96,12 +90,11 @@ fun PostHeader(
 @Composable
 @Preview(showBackground = true)
 fun PostHeaderPreview(){
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         PostHeader(
             profile_picture = user.profile_picture,
             navigationViewModel = hiltViewModel(),
             user_name = "David",
-            modifier = Modifier,
         ) {}
     }
 }

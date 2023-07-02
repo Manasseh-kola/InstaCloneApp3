@@ -44,7 +44,8 @@ fun FollowersItem(
     following: Posts,
     buttonColor: Color = Color(240, 240, 240),
     textColor: Color = Color.Black,
-    text: String = "Remove"
+    text: String = "Remove",
+    buttonWidth: Float = 0.7f
 ){
     Row(
         modifier = Modifier
@@ -82,7 +83,7 @@ fun FollowersItem(
             }
         }
 
-        FollowingButton(text = text, width = 0.7f, textColor, buttonColor)
+        FollowingButton(text = text, width = buttonWidth, textColor, buttonColor)
 
     }
 }

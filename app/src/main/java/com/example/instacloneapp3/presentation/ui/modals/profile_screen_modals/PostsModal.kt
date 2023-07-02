@@ -3,7 +3,6 @@ package com.example.instacloneapp3.presentation.ui.modals.profile_screen_modals
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -34,8 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -43,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostFooter
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.PostHeader
@@ -90,13 +86,12 @@ fun PostItem(
         PostHeader(
             navigationViewModel = navigationViewModel,
             profile_picture = post.profile_picture,
-            modifier = Modifier.fillMaxWidth(),
             user_name = post.user_name,
 
         ){}
 
         //Posted Content
-        Box(){
+        Box {
             PostItemPager(
                 postContent = post.mediaContent,
                 pagerState = pagerState
@@ -154,7 +149,7 @@ fun PostsModalHeader(showModal: MutableState<Boolean>) {
         Column(
             modifier = Modifier.align(Alignment.Center)
         ) {
-            Text(text = "${user.user_name}")
+            Text(text = user.user_name)
             Text(text = "Posts", fontWeight = FontWeight.Bold)
         }
     }
@@ -229,7 +224,7 @@ fun PostsModal(
 @Composable
 @Preview(showBackground = true)
 fun PostsModalPreview(){
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         PostsModal(
             navigationViewModel = hiltViewModel(),
             showModal = remember{ mutableStateOf(false)},

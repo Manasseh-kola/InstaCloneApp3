@@ -8,7 +8,6 @@ import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,8 +21,8 @@ import com.example.instacloneapp3.presentation.ui.screens.messages_screen.Messag
 import com.example.instacloneapp3.presentation.ui.screens.profile_screen.user.ProfileScreen
 import com.example.instacloneapp3.presentation.ui.screens.reels.ReelsScreen
 import com.example.instacloneapp3.presentation.ui.screens.search_screen.SearchScreen
-import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.modals.ModalSheets
+import com.example.instacloneapp3.presentation.ui.navigation.navigation_stacks.HomeScreensEntryPoint
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipScreen
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.users.UsersRelationShipScreen
 import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
@@ -51,15 +50,16 @@ fun NavGraphBuilder.authenticatedGraph(
 ){
     navigation(startDestination = "home", route = "authenticated"){
         composable(Screen.Home.route){
-            HomeScreen(
-                modalState = modalState,
+            HomeScreensEntryPoint(
+                modalState = modalState ,
+                backNavigation = backNavigation,
                 navigateToRoute = navigateToRoute,
                 currentModalSheet = currentModalSheet,
-                navigationViewModel = navigationViewModel
+                navigationViewModel = navigationViewModel ,
             )
         }
         composable(Screen.Search.route){ SearchScreen() }
-        composable(Screen.New.route){ Row(){ Text(text = "Add new") } }
+        composable(Screen.New.route){ Row { Text(text = "Add new") } }
         composable(Screen.Reels.route){ ReelsScreen(navigateToRoute,backNavigation) }
         composable(Screen.Profile.route){ ProfileScreen(navigateToRoute, currentModalSheet, navigationViewModel) }
         composable(Screen.Messages.route){ MessagesScreen(backNavigation, navigateToRoute) }

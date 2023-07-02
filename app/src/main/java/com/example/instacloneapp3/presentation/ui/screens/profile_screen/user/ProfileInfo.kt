@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImageModifier
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
@@ -50,7 +49,7 @@ fun ProfileInfo(
     userIndex: Int = 0
 ){
     //Current page in Relationship screens
-    val currentPage = if(info == "Followers") "0" else "1"
+    val currentPage = if(info == "Followers") "1" else "2"
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -58,8 +57,8 @@ fun ProfileInfo(
             .clickable {
                 /*
                 Navigate to relationship screens
-                - page 0 = Followers screen
-                - page 1 = Following screen
+                - page 1 = Followers screen
+                - page 2 = Following screen
                  */
                 navigateToRoute("$destination/$currentPage*$userIndex")
             }
@@ -78,7 +77,6 @@ fun ProfileInfo(
 @Composable
 fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
 
-    val stories = StoriesRepo().getStories()
     Column(
         modifier = Modifier
             .padding(horizontal = 10.dp)
@@ -202,7 +200,7 @@ fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
 @Preview(showBackground = true)
 fun ProfileInfoPreview(){
     val appState = rememberAppState()
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         ProfileInfoTab(
             navigateToRoute = appState::onNavigateToScreen
         )

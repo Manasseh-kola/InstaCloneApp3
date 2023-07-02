@@ -15,7 +15,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,12 +24,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.R
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 @Composable
 fun DropDown(
     modifier: Modifier,
-    currentHomeModal: MutableState<HomeModals>,
-    showHomeModal: ()-> Unit
+    navigationViewModel: NavigationViewModel,
 ){
 
     //State of Dropdown menu
@@ -107,8 +107,7 @@ fun DropDown(
                         modifier = Modifier
                             .padding(end = 18.dp)
                             .clickable{
-                                isDropdownExpanded.value = false
-                                showHomeModal()
+                                navigationViewModel.addRouteToBackStack(AppScreens.FavoritesFeeds)
                             }
                     )
                 }

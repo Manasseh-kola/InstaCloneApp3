@@ -60,7 +60,7 @@ import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
 import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.LikedBy
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.SuggestedForYou
@@ -76,7 +76,6 @@ import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 @Composable
 fun UsersProfileScreen(
     navigateToRoute: (String) -> Unit,
-    showHomeModal: MutableState<Boolean>,
     navigationViewModel: NavigationViewModel
 ){
     val navigationUiState = navigationViewModel.navigationState.collectAsState()
@@ -144,7 +143,7 @@ fun UsersProfileScreen(
             ProfileHeader(
                 navigationViewModel = navigationViewModel,
                 userName = currentUser.user_name
-            ){showHomeModal.value = false}
+            )
 
             ProfileInfoTab(
                 userIndex = userIndex,
@@ -197,13 +196,14 @@ fun StoryHighlights() {
 fun ProfileHeader(
     navigationViewModel: NavigationViewModel,
     userName: String,
-    hideModal: ()-> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
     ){
+
+        //Back Button
         Icon(
             imageVector = Icons.Default.KeyboardArrowLeft,
             contentDescription = "",
@@ -211,7 +211,7 @@ fun ProfileHeader(
                 .size(40.dp)
                 .align(Alignment.CenterStart)
                 .clickable {
-                    hideModal()
+                   navigationViewModel.popBackStack()
                 }
         )
 
@@ -236,7 +236,7 @@ fun ProfileHeader(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.USERS_PROFILE_NOTIFICATIONS,
-                            currentScreen = AppScreenTypes.UsersProfile
+                            currentScreen = AppScreens.UsersProfile
                         )
                     }
             )
@@ -412,7 +412,6 @@ fun UsersProfileScreenPreview(){
         UsersProfileScreen(
             navigationViewModel = hiltViewModel(),
             navigateToRoute = appState::onNavigateToScreen,
-            showHomeModal = remember{ mutableStateOf(false)},
         )
     }
 }

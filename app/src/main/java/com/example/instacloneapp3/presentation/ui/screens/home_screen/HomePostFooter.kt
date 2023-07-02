@@ -13,9 +13,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.profile_screen_bottom_sheets.user.try_new_account.PagerIndicator
-import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
@@ -86,7 +83,7 @@ fun PostFooter(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.SHARE_CONTENT,
-                            currentScreen = AppScreenTypes.Home,
+                            currentScreen = AppScreens.Home,
                         )
                     }
             )
@@ -123,7 +120,7 @@ fun PostFooter(
 @Composable
 @Preview(showBackground = true)
 fun PostFooterPreview(){
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         PostFooter(
             pagerState = rememberPagerState(),
             navigationViewModel = hiltViewModel(),

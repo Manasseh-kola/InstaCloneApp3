@@ -39,7 +39,11 @@ fun SubscribeScreen(
                 )
             }
             items(subscribeList){ subscribe ->
-                FollowersItem(following = subscribe, Color(3, 109, 202, 201), Color.White, text = "Subscribe")
+                FollowersItem(
+                    following = subscribe,
+                    buttonWidth = 0.8f,
+                    buttonColor = Color(3, 109, 202, 201),
+                    textColor = Color.White, text = "Subscribe")
             }
 
             item{
@@ -50,7 +54,12 @@ fun SubscribeScreen(
                 )
             }
             items(subscribeList){ subscribe ->
-                FollowersItem(following = subscribe, Color(3, 109, 202, 201), Color.White, text = "Subscribe")
+                FollowersItem(
+                    following = subscribe,
+                    buttonColor = Color(3, 109, 202, 201),
+                    textColor = Color.White, text = "Subscribe",
+                    buttonWidth = 0.8f
+                )
             }
 
         }

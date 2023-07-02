@@ -14,9 +14,6 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
+import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
 import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
@@ -58,7 +55,7 @@ fun ProfileDropDown(
                 .clickable{
                     navigationViewModel.openBottomSheet(
                         currentBottomSheet = BottomSheets.TRY_NEW_ACCOUNT,
-                        currentScreen = AppScreenTypes.Profile
+                        currentScreen = AppScreens.UserProfile
                     )
             }
         )
@@ -100,7 +97,7 @@ fun ProfileHeader(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.CREATE_NEW_CONTENT,
-                            currentScreen = AppScreenTypes.Profile
+                            currentScreen = AppScreens.UserProfile
                         )
                     }
             )
@@ -114,7 +111,7 @@ fun ProfileHeader(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.MANAGE_USER_ACCOUNT,
-                            currentScreen = AppScreenTypes.Profile
+                            currentScreen = AppScreens.UserProfile
                         )
                     }
             )
@@ -126,7 +123,7 @@ fun ProfileHeader(
 @Composable
 @Preview(showBackground = true)
 fun ProfileHeaderPreview(){
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         ProfileHeader(
             navigationViewModel = hiltViewModel()
         )
