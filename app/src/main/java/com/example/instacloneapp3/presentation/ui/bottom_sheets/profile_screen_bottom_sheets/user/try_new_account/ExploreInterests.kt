@@ -14,8 +14,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.instacloneapp3.presentation.ui.screens.home_screen.LikedBy
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.screens.home_screen.components.LikedBy
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 @Composable
 fun ExploreInterests(){

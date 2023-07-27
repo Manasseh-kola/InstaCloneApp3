@@ -1,13 +1,11 @@
 package com.example.instacloneapp3.presentation.view_models
 
-
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.states.NavigationStates
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +21,8 @@ class NavigationViewModel @Inject constructor(
     val navigationState = _navigationState.asStateFlow()
 
 
-    //Open BottomSheet if it is closed
-    fun openBottomSheet(currentBottomSheet: BottomSheets, currentScreen: AppScreens){
+    //--Open BottomSheet if it is closed--
+    fun openBottomSheet(currentBottomSheet: BottomSheets, currentScreen: AppScreenTypes){
         if (_navigationState.value.showBottomSheet) return
         _navigationState.update { currentNavigationState ->
             currentNavigationState.copy(
@@ -35,7 +33,7 @@ class NavigationViewModel @Inject constructor(
         }
     }
 
-    //Close BottomSheet if it is opened
+    //--Close BottomSheet if it is opened--
     fun closeBottomSheet(){
         if (!_navigationState.value.showBottomSheet) return
         _navigationState.update { currentNavigationState ->
@@ -43,46 +41,109 @@ class NavigationViewModel @Inject constructor(
         }
     }
 
-
-    //Add a currentUser
+    //--Add a currentUser--
     fun addCurrentUser(currentUser: Posts?){
         _navigationState.update { currentNavigationState ->
             currentNavigationState.copy(currentUser = currentUser)
         }
     }
 
-
-    //Set currentStack Root
-    fun setStackRoot(root: AppScreens){
-        when(root){
-            AppScreens.Home -> {
-                val homeStack = _navigationState.value.homeStack
-                _navigationState.update { state ->
-                    state.copy(
-                        currentStackRoot = root,
-                        currentStack = homeStack,
-                    )
-                }
-            }
-            else ->{}
+    //-- Set value of screenXOffset and prevScreenXOffset --
+    fun setScreenXOffset(offset: Float){
+        _navigationState.update{state ->
+            state.copy(
+                screenXOffset = offset,
+                prevScreenXOffset = -offset / 8
+            )
         }
     }
 
-    //Add to backStack
-    fun addRouteToBackStack(destination: AppScreens){
-        _navigationState.value.currentStack.add(destination)
-        _navigationState.update{ state -> state.copy(
-            updateStack = !_navigationState.value.updateStack,
-            newScreenOnStack = !_navigationState.value.newScreenOnStack,
+    //--Update XOffset for top and bottom Screen--
+    fun updateTopScreenXOffset(delta: Float){
+        val currentXOffset = _navigationState.value.topScreenXOffset
+        val prevXOffset = _navigationState.value.prevScreenXOffset
+        if ( currentXOffset + delta >= 0.0f ){
+            _navigationState.update { state ->
+                state.copy(
+                    topScreenXOffset = currentXOffset + delta,
+                    prevScreenXOffset = prevXOffset + delta / 8
+                )
+            }
+        }
+    }
+
+    //--Reset XOffsets--
+    fun resetScreenXOffset(){
+        val screenXOffset = _navigationState.value.screenXOffset
+        _navigationState.update { state -> state.copy(
+            topScreenXOffset = 0.0f,
+            prevScreenXOffset = -screenXOffset / 8,
+            prevScreenIndex = -1,
         ) }
     }
 
-    //Remove from backStack
+    fun cleanUpXOffset(){
+        _navigationState.update{ state -> state.copy(
+            topScreenXOffset = 0.0f,
+        )}
+    }
+
+    private fun setPrevScreenIndex(){
+        val nextPrevScreenIndex = _navigationState.value.currentStack.lastIndex - 1
+        _navigationState.update { state ->
+            state.copy(
+                prevScreenXOffset = 0.0f,
+                prevScreenIndex = nextPrevScreenIndex
+            )
+        }
+    }
+
+    fun horizontalScreenDragEnded(xBreakPoint: Float){
+        val screenXOffset = _navigationState.value.screenXOffset
+        val currentXOffset = _navigationState.value.topScreenXOffset
+        if(currentXOffset > xBreakPoint){
+            setPrevScreenIndex()
+            popBackStack()
+        }
+        else{
+            _navigationState.update { state ->
+                state.copy(
+                    topScreenXOffset = 0.0f,
+                    prevScreenXOffset = -screenXOffset / 8f,
+                )
+            }
+        }
+    }
+
+    //--Set root screen of current stack--
+    private fun setStackRoot(root: AppScreenTypes){
+        _navigationState.update { state -> state.copy(currentStackRoot = root) }
+    }
+
+    //--Select current stack--
+    fun selectStack(rootScreen: AppScreenTypes){
+        setStackRoot(rootScreen)
+        val currentStack = when(_navigationState.value.currentStackRoot){
+            is AppScreenTypes.Home -> _navigationState.value.homeStack
+            is AppScreenTypes.New -> _navigationState.value.newPostStack
+            is AppScreenTypes.Reels -> _navigationState.value.reelsStack
+            is AppScreenTypes.Search -> _navigationState.value.searchStack
+            is AppScreenTypes.Messages -> _navigationState.value.messagesStack
+            is AppScreenTypes.UserProfile -> _navigationState.value.userProfileStack
+            else -> {_navigationState.value.homeStack}
+        }
+        _navigationState.update { state -> state.copy(currentStack = currentStack)}
+    }
+
+    //--Push new screen on stack--
+    fun pushToBackStack(screenRoute: AppScreenTypes){
+        _navigationState.value.currentStack.add(screenRoute)
+    }
+
+    //--Pop top of stack--
     fun popBackStack(){
         val currentStack = _navigationState.value.currentStack
-        if(currentStack.size == 0) return
-        currentStack.removeAt(currentStack.lastIndex)
-        _navigationState.update { state -> state.copy(updateStack = !_navigationState.value.updateStack )}
+        navigationState.value.currentStack.removeAt(currentStack.lastIndex)
     }
 
 }

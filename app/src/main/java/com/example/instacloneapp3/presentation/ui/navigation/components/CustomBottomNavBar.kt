@@ -9,69 +9,57 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
-import com.example.instacloneapp3.R
+import androidx.navigation.NavDestination.Companion.hierarchy
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-
-sealed class NavBarScreen(
-    val route: String,
-    val icon : Int,
-    val selectedIcon: Int
-) {
-    object Home : NavBarScreen("home", R.drawable.ic_outlined_home, R.drawable.ic_filled_home)
-    object Search : NavBarScreen("search", R.drawable.ic_outlined_search, R.drawable.ic_outlined_search)
-    object New : NavBarScreen("newPost", R.drawable.ic_outlined_add, R.drawable.ic_outlined_add)
-    object Reels : NavBarScreen("reels", R.drawable.ic_outlined_reels, R.drawable.ic_outlined_reels)
-    object Profile : NavBarScreen("profile", R.drawable.ic_outlined_camera, R.drawable.ic_outlined_camera)
-}
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 val bottomTabs = listOf(
-    NavBarScreen.Home,
-    NavBarScreen.Search,
-    NavBarScreen.New,
-    NavBarScreen.Reels,
-    NavBarScreen.Profile
+    AppScreenTypes.Home(),
+    AppScreenTypes.Search(),
+    AppScreenTypes.New,
+    AppScreenTypes.Reels(),
+    AppScreenTypes.UserProfile()
 )
-
 
 @Composable
 fun NavBarItem(
-    route: String,
-    iconId: Int,
+    selected: Boolean,
+    screen: AppScreenTypes,
     onNavigate: (String) -> Unit,
-    currentRoute: MutableState<String>
+    navigationViewModel: NavigationViewModel,
 ){
+        val iconId = if(selected) screen.selectedIcon
+        else screen.icon
         Icon(
-            painter = painterResource(id = iconId),
+            painter = painterResource(id = iconId!!),
             contentDescription = "",
             modifier = Modifier
-                .size(27.dp)
-                .clickable(
-                    onClick = {
-                        onNavigate(route)
-                        currentRoute.value = route
-                    }
-                )
+                .size(if(screen.route!= "reels") 35.dp else 33.dp)
+                .clickable{
+                    navigationViewModel.selectStack(screen)
+                    onNavigate(screen.route)
+                }
         )
 }
 
 @Composable
 fun InstagramCloneNavBar(
     onNavigate: (String) -> Unit,
-    navBackStackEntry: NavBackStackEntry?
+    navBackStackEntry: NavBackStackEntry?,
+    navigationViewModel: NavigationViewModel
 ){
-    val currentRoute = remember{ mutableStateOf("home")}
 
-    //Navigation bar root element
+    val currentDestination = navBackStackEntry?.destination
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,16 +70,13 @@ fun InstagramCloneNavBar(
     ){
         bottomTabs.forEach{ screen ->
             NavBarItem(
-                route = screen.route,
-                iconId = if(screen.route == currentRoute.value) screen.selectedIcon
-                else screen.icon,
+                screen = screen,
                 onNavigate = onNavigate,
-                currentRoute = currentRoute
+                navigationViewModel = navigationViewModel,
+                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
             )
         }
-
     }
-
 }
 
 
@@ -101,8 +86,9 @@ fun InstagramCloneNavBarPreview(){
     InstaCloneApp3Theme {
         val appState = rememberAppState()
         InstagramCloneNavBar(
-            appState::onBottomNavBarNavigation,
-            appState.navController.currentBackStackEntry
+            navigationViewModel = hiltViewModel(),
+            onNavigate = appState::onBottomNavBarNavigation,
+            navBackStackEntry = appState.navController.currentBackStackEntry,
         )
     }
 }

@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.Stories
 import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 
 /*

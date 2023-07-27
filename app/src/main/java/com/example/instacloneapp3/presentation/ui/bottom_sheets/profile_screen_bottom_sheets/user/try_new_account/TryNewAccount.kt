@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 enum class ModalPages{
     SmallerGroup,
@@ -72,7 +72,7 @@ fun TryNewAccountButton(
 
     ) {
         Text(
-            "$text",
+            text,
             color = Color.White,
             fontSize = textSize,
             fontWeight = FontWeight.Bold,
@@ -96,8 +96,11 @@ fun TryNewAccount(){
             .fillMaxWidth()
     ) {
 
-        Column(){
-            HorizontalPager(pageCount = modalPages.size) { page ->
+        Column {
+            HorizontalPager(
+                state = pagerState,
+                pageCount = modalPages.size
+            ) { page ->
                 when(modalPages[page]){
                     ModalPages.SmallerGroup -> CreateSmallerGroup()
                     ModalPages.ExploreInterests -> ExploreInterests()

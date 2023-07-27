@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.ui.bottom_sheets.BottomSheets
-import com.example.instacloneapp3.presentation.ui.navigation.graphs.AppScreens
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 /*
@@ -55,7 +55,7 @@ fun ProfileDropDown(
                 .clickable{
                     navigationViewModel.openBottomSheet(
                         currentBottomSheet = BottomSheets.TRY_NEW_ACCOUNT,
-                        currentScreen = AppScreens.UserProfile
+                        currentScreen = AppScreenTypes.UserProfile()
                     )
             }
         )
@@ -97,7 +97,7 @@ fun ProfileHeader(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.CREATE_NEW_CONTENT,
-                            currentScreen = AppScreens.UserProfile
+                            currentScreen = AppScreenTypes.UserProfile()
                         )
                     }
             )
@@ -111,7 +111,7 @@ fun ProfileHeader(
                     .clickable {
                         navigationViewModel.openBottomSheet(
                             currentBottomSheet = BottomSheets.MANAGE_USER_ACCOUNT,
-                            currentScreen = AppScreens.UserProfile
+                            currentScreen = AppScreenTypes.UserProfile()
                         )
                     }
             )

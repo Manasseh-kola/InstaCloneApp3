@@ -30,8 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+
+/*
+User Followers Screen
+ */
 
 val followersCategories = listOf(
     listOf("Accounts you don't follow back ", "40"),
@@ -42,24 +45,22 @@ val followersCategories = listOf(
 @Composable
 fun FollowersItem(
     following: Posts,
-    buttonColor: Color = Color(240, 240, 240),
-    textColor: Color = Color.Black,
     text: String = "Remove",
-    buttonWidth: Float = 0.7f
+    buttonWidth: Float = 0.7f,
+    textColor: Color = Color.Black,
+    buttonColor: Color = Color(240, 240, 240),
 ){
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(horizontal = 10.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
     ){
-        Row(
-            modifier = Modifier.fillMaxWidth(0.6f)
-        ){
+        Row( modifier = Modifier.fillMaxWidth(0.6f) ){
             Image(
-                contentScale = ContentScale.Crop,
                 painter = painterResource(id = following.profile_picture),
+                contentScale = ContentScale.Crop,
                 contentDescription = "",
                 modifier = Modifier
                     .size(60.dp)
@@ -69,13 +70,13 @@ fun FollowersItem(
                 modifier = Modifier.padding(start = 10.dp)
             ) {
                 Text(
-                    text = "${following.user_name}",
+                    text = following.user_name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = "${following.user_name}",
+                    text = following.user_name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -89,19 +90,29 @@ fun FollowersItem(
 }
 
 @Composable
-fun FollowersCategories(followingList: List<Posts>, text: String = "Categories"){
+fun FollowersCategories(
+    followingList: List<Posts>,
+    text: String = "Categories",
+) {
     Column {
-        Text(text = text, fontSize = 18.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp))
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp)
+        )
         for(i in 0..3 step 2){
-            CategoryItem(followingList[i], followingList[i+1], followersCategories[i/2])
+            CategoryItem(
+                user1 = followingList[i],
+                user2 = followingList[i+1],
+                textInfo = followersCategories[i/2]
+            )
         }
     }
 }
 
 @Composable
 fun FollowersScreen(
-    backNavigation: (String, String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ){
     val followersList = PostsRepo().getPosts()
     val search = remember{ mutableStateOf("") }
@@ -137,14 +148,12 @@ fun FollowersScreen(
 @Composable
 @Preview(showBackground = true)
 fun FollowersScreenPreview(){
-    val appstate = rememberAppState()
+
     InstaCloneApp3Theme {
-        LazyRow()
-        {
+        LazyRow() {
             item{
                 FollowersScreen(
-                    appstate::backNavigation, modifier = Modifier
-                        .fillParentMaxSize()
+                    modifier = Modifier.fillParentMaxSize(),
                 )
             }
         }

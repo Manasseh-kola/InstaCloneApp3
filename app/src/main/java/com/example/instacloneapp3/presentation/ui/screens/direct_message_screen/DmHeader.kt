@@ -25,15 +25,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 @Composable
 fun DmHeader(
     profilePicture: Int,
     userName: String,
-    hideModal: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    navigationViewModel: NavigationViewModel
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -49,7 +51,10 @@ fun DmHeader(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "",
                 modifier = Modifier
-                    .clickable(onClick = {hideModal()})
+                    .clickable{
+                        //Navigate back
+                        navigationViewModel.popBackStack()
+                    }
             )
 
             //Profile Picture
@@ -64,8 +69,7 @@ fun DmHeader(
             )
 
             //User name and handle
-            Column(
-            ) {
+            Column{
                 Text(text = userName)
                 Text(text = "_" + userName + "_")
             }
@@ -87,14 +91,14 @@ fun DmHeader(
 @Composable
 @Preview(showBackground = true)
 fun DmHeaderPreview(){
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         DmHeader(
             profilePicture = user.profile_picture,
-            userName = user.user_name ,
-            hideModal = { /*TODO*/ },
+            navigationViewModel = hiltViewModel(),
+            userName = user.user_name,
             modifier = Modifier
                 .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
 
         )
     }

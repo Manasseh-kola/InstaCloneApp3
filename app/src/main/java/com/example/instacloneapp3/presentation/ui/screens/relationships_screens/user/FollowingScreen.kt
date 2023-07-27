@@ -51,7 +51,8 @@ import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
 import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 @Composable
 fun RelationshipSearchBar(
@@ -100,8 +101,8 @@ fun RelationshipSearchBar(
                 if (leadingIcon != null){
                     Icon(
                         tint = Color.Gray,
-                        imageVector = leadingIcon ,
                         contentDescription = "",
+                        imageVector = leadingIcon ,
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }
@@ -290,8 +291,7 @@ fun FollowingItem(following: Posts, userProfile: Boolean = true, isFollowing: Bo
 
 @Composable
 fun FollowingScreen(
-    backNavigation: (String, String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ){
     val followingList = PostsRepo().getPosts()
     val search = remember{ mutableStateOf("")}
@@ -323,11 +323,12 @@ fun FollowingScreen(
 @Composable
 @Preview(showBackground = true)
 fun FollowingScreenPreview(){
-    val appstate = rememberAppState()
     InstaCloneApp3Theme {
         LazyRow(){
             item{
-                FollowingScreen(appstate::backNavigation, Modifier.fillParentMaxSize())
+                FollowingScreen(
+                    modifier = Modifier.fillParentMaxSize(),
+                )
             }
         }
     }

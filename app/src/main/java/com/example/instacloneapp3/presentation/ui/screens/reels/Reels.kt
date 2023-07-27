@@ -10,8 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.screens.reels.components.Reel
+import com.example.instacloneapp3.presentation.ui.screens.reels.components.ReelsHeader
 import com.example.instacloneapp3.presentation.view_models.VideoViewModel
 
 
@@ -22,9 +23,7 @@ Reels Screen
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReelsScreen(
-    navigateToRoute: (String) -> Unit,
-    backNavigation: (String, String) -> Unit,
-    videoViewModal: VideoViewModel = hiltViewModel<VideoViewModel>()
+    videoViewModal: VideoViewModel = hiltViewModel()
 ) {
 
     val posts = PostsRepo().getPosts()
@@ -41,7 +40,6 @@ fun ReelsScreen(
             state = pagerState
         ) {page ->
                     Reel(
-                    navigateToRoute = navigateToRoute,
                     videoViewModal = videoViewModal,
                     post = posts[page],
                     modifier = Modifier
@@ -59,11 +57,7 @@ fun ReelsScreen(
 @Composable
 @Preview(showBackground = true)
 fun ReelsScreenPreview(){
-    val appState = rememberAppState()
-    InstaCloneApp3Theme() {
-        ReelsScreen(
-            appState::onNavigateToScreen,
-            appState::backNavigation
-        )
+    InstaCloneApp3Theme {
+        ReelsScreen()
     }
 }

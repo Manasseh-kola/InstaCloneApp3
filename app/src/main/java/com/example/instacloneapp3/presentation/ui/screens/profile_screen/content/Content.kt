@@ -1,5 +1,6 @@
 package com.example.instacloneapp3.presentation.ui.screens.profile_screen.content
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -40,20 +41,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationShipSelector
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.startOffsetForPage
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /*
@@ -64,10 +65,6 @@ Contains
 - Tagged Lazy Grid
  */
 
-val colorStops = arrayOf(
-    0.0f to Color(0,0,0,50),
-    1f to Color(0,0,0,0),
-)
 
 sealed class ContentScreens(val icon : ImageVector){
     object PostedContent: ContentScreens(icon  = Icons.Filled.Person)
@@ -81,7 +78,6 @@ val contentScreens = listOf(
     ContentScreens.TaggedContent
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PostItem(
     thumbnailImage: Int,
@@ -98,13 +94,17 @@ fun PostItem(
             contentDescription = "",
             modifier = Modifier
                 .aspectRatio(1f)
+                .onGloballyPositioned { layoutCoordinates ->
+                    val rect = layoutCoordinates.boundsInWindow()
+                    Log.i("navigation", "${rect.topLeft} ${rect.center} ${rect.topRight} $index")
+                }
                 .clickable {
                     modalStartScrollIndex.value = index
                     showModal.value = true
                 }
         )
 
-        //Gradient Overlay for visibility of white texts
+        //--Gradient Overlay for visibility of white texts--
         Canvas(
             onDraw = {
                 val size = size
@@ -147,14 +147,14 @@ fun PostNavigationBar(
     coroutineScope: CoroutineScope,
 ) {
 
-    //Function to navigate to content category
+    //--Function to navigate to content category--
     fun onClick(page:Int) {
         coroutineScope.launch {
             pagerState.animateScrollToPage(page)
         }
     }
 
-    // Content Category Icons
+    //--Content Category Icons/Buttons--
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -168,7 +168,6 @@ fun PostNavigationBar(
                 imageVector = contentScreens[page].icon,
                 modifier = Modifier.clickable(onClick = {onClick(page)}),
                 tint = if(page == pagerState.currentPage) Color.Black else Color.Gray
-
             )
         }
     }
@@ -181,7 +180,7 @@ fun UserContent(
     postsGridState: LazyGridState,
     reelsGridState: LazyGridState,
     taggedGridState: LazyGridState,
-    currentContent: MutableState<String>,
+    currentContent: MutableState<ContentScreens>,
     showModal: MutableState<Boolean>,
     modalStartScrollIndex: MutableState<Int>,
     transformOriginOffset: MutableState<Offset>
@@ -193,7 +192,15 @@ fun UserContent(
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
     val xOffset = remember { mutableStateOf(0.00f) }
-    val animatedXOffset = animateFloatAsState(targetValue = xOffset.value)
+    val animatedXOffset = animateFloatAsState(targetValue = xOffset.value, label = "")
+
+    LaunchedEffect(key1 = pagerState.currentPage){
+        if(scrollState.value != scrollState.maxValue){
+            postsGridState.scrollToItem(0)
+            reelsGridState.scrollToItem(0)
+            taggedGridState.scrollToItem(0)
+        }
+    }
 
 
 
@@ -204,7 +211,7 @@ fun UserContent(
         Box(
             modifier = Modifier.padding(bottom = 2.dp)
         ) {
-            //Current Page Indicator
+            //--Current Content/Page Indicator--
             RelationShipSelector(1f, 0.5.dp , Color.Gray, Modifier)
             RelationShipSelector((1.0f/3.0f), 1.dp , Color.Black,
                 Modifier
@@ -217,15 +224,16 @@ fun UserContent(
             pageCount = contentScreens.size,
             state = pagerState
         ) {page->
-           Box(){
+           Box{
                Column(modifier = Modifier
                    .graphicsLayer {
                        xOffset.value = pagerState.startOffsetForPage(page)
                    }
                ){
                    when (contentScreens[page]) {
+                       //--Users Posts--
                        ContentScreens.PostedContent -> {
-                           currentContent.value = "postsContent"
+                           currentContent.value = ContentScreens.PostedContent
                            PostedContent(
                                showModal = showModal,
                                scrollState = scrollState,
@@ -235,8 +243,9 @@ fun UserContent(
                            )
                        }
 
+                       //--Users Reels--
                        ContentScreens.ReelsContent -> {
-                           currentContent.value = "reelsContent"
+                           currentContent.value = ContentScreens.ReelsContent
                            ReelsContent(
                                showModal = showModal,
                                scrollState = scrollState,
@@ -246,8 +255,9 @@ fun UserContent(
                            )
                        }
 
+                       //--Users Tagged Posts--
                        ContentScreens.TaggedContent -> {
-                           currentContent.value = "taggedContent"
+                           currentContent.value = ContentScreens.TaggedContent
                            TaggedContent(
                                showModal = showModal,
                                scrollState = scrollState,
@@ -275,7 +285,7 @@ fun UserContentPreview(){
             taggedGridState = rememberLazyGridState(),
             showModal = remember{ mutableStateOf(false)},
             modalStartScrollIndex = remember{ mutableStateOf(0)},
-            currentContent = remember{ mutableStateOf("postsContent") },
+            currentContent = remember{ mutableStateOf(ContentScreens.PostedContent) },
             transformOriginOffset = remember{ mutableStateOf(Offset(0f,0f))}
         )
     }

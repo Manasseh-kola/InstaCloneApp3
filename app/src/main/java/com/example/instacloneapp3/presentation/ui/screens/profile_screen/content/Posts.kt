@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
+/*
+User Posts Lazy Grid
+ */
 @Composable
 fun PostedContent(
     gridState: LazyGridState,
@@ -45,7 +47,7 @@ fun PostedContent(
 
     LazyVerticalGrid(
         state = gridState,
-        columns = GridCells.Adaptive(minSize = 128.dp),
+        columns = GridCells.Fixed(3),
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp),
         userScrollEnabled = scrollState.value == scrollState.maxValue,
@@ -53,16 +55,7 @@ fun PostedContent(
         itemsIndexed(posts){ index, post ->
             Column(
                 modifier = Modifier
-                    .onGloballyPositioned { coordinates ->
-                        val offset = coordinates.positionInRoot()
-                        if (
-                            offset.x != transformOriginOffset.value.x
-                            && offset.y != transformOriginOffset.value.y
-                        ) {
-                            transformOriginOffset.value = offset
-                        }
-
-                    }
+                    .onGloballyPositioned {}
             ){
                 Box{
                     PostItem(
@@ -73,6 +66,7 @@ fun PostedContent(
                         transformOriginOffset = transformOriginOffset,
                     )
 
+                    //--Show Indicator if post has multiple posts--
                     if(post.mediaContent.size > 1){
                         MultipleContentIndicator(
                             Modifier

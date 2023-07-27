@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,25 +29,40 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.rememberAppState
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
+import com.example.instacloneapp3.presentation.ui.core.components.HorizontalDraggableScreen
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
+
+/*
+Messages Screen
+ */
 
 @Composable
-fun MessagesHeader(username: String, modifier: Modifier.Companion, backNavigation: (String, String) -> Unit) {
+fun MessagesHeader(
+    username: String,
+    modifier: Modifier,
+    onClick: ()->Unit,
+) {
     Row(
         modifier
             .fillMaxWidth()
@@ -55,17 +71,17 @@ fun MessagesHeader(username: String, modifier: Modifier.Companion, backNavigatio
         ,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
-        Row(){
+        Row {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "",
                 modifier = Modifier
-                    .clickable(onClick = {backNavigation("home", "home")})
+                    .clickable{ onClick() }
             )
-            Text("$username")
+            Text(username)
             Icon(imageVector = Icons.Filled.KeyboardArrowDown, contentDescription = "")
         }
-        Row(){
+        Row {
             Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "")
             Icon(imageVector = Icons.Filled.Create, contentDescription = "")
         }
@@ -75,19 +91,19 @@ fun MessagesHeader(username: String, modifier: Modifier.Companion, backNavigatio
 
 @Composable
 fun SearchBar(){
-    var text_value = remember { mutableStateOf("") }
+    val textValue = remember { mutableStateOf("") }
 
     Row(
         verticalAlignment =  Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
 
         BasicTextField(
-            value = text_value.value,
-            onValueChange = {text_value.value = it},
+            value = textValue.value,
+            onValueChange = {textValue.value = it},
             decorationBox = {innerTextField ->
                 Box(
                     modifier = Modifier
@@ -107,7 +123,7 @@ fun SearchBar(){
                     )
 
                     //Place Holder Text
-                    if (text_value.value.isEmpty()) {
+                    if (textValue.value.isEmpty()) {
                         Text(
                             "Search",
                             color = Color.Black,
@@ -136,11 +152,12 @@ fun SearchBar(){
 @Composable
 fun MessageCategoryBar(){
     Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
         ,
-        horizontalArrangement = Arrangement.SpaceEvenly
+
     ){
         Text("Primary",
             modifier = Modifier
@@ -174,21 +191,28 @@ fun MessageCategoryBar(){
 
 @Composable
 fun MessageItem(
+    navigationViewModel: NavigationViewModel,
     senderProfilePicture : Int,
     senderName: String,
     message: String,
-    id:Int,
-    navigateToRoute: (String) -> Unit
-)
-{
+) {
+    //--Navigation State
+    val navigationUiState = navigationViewModel.navigationState.collectAsState()
+
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp, horizontal = 10.dp)
-            .clickable(onClick = { navigateToRoute("directMessage") })
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .clickable {
+                //Navigate to dm Screen
+                navigationViewModel.pushToBackStack(
+                    AppScreenTypes.DirectMessages(
+                        screenIndex = navigationUiState.value.currentStack.size
+                    )
+                )
+            }
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -206,8 +230,8 @@ fun MessageItem(
             Column(
                 modifier = Modifier.padding(horizontal = 10.dp)
             ) {
-                Text("$senderName")
-                Text("$message")
+                Text(senderName)
+                Text(message)
             }
 
         }
@@ -220,61 +244,102 @@ fun MessageItem(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessagesScreen(
-    backNavigation: (String, String) -> Unit,
-    navigateToRoute: (String) -> Unit
+    navigationViewModel: NavigationViewModel,
+    screenStackIndex: Int,
+    onClick: () -> Unit
 ) {
 
+    //Keyboard Controller
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    //Visibility of keyboard
+    val keyboardVisibility = remember { mutableStateOf(false)}
     val messages = PostsRepo().getPosts()
-    Box(){
-
-       LazyColumn(
-           modifier = Modifier
-               .fillMaxSize()
-       ){
-
-           item(){
-               Spacer(
-                   Modifier
-                       .fillMaxWidth()
-                       .height(40.dp))
-           }
-
-           item {
-               SearchBar()
-           }
-           item {
-               MessageCategoryBar()
-           }
 
 
-           items(messages){ message ->
-               MessageItem(
-                   message.profile_picture,
-                   message.user_name,
-                   message.caption,
-                   message.id,
-                   navigateToRoute
-               )
-           }
+    HorizontalDraggableScreen(
+        dragEnabled = false,
+        screenStackIndex = screenStackIndex,
+        navigationViewModel = navigationViewModel
+    ){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null,
+                    onClick = {
+                        if (keyboardVisibility.value) {
+                            keyboardController?.hide()
+                            keyboardVisibility.value = false
+                        }
+                    }
+                )
+                .onGloballyPositioned { layoutCoordinates ->
+                    val height = layoutCoordinates.size.height
+                    if (height == 1275) {
+                        if (!keyboardVisibility.value) {
+                            keyboardVisibility.value = true
+                        }
+                    } else if (keyboardVisibility.value) {
+                        keyboardVisibility.value = false
+                    }
+                }
+        ) {
+            Box {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
 
-       }
-        MessagesHeader(user.user_name, modifier = Modifier, backNavigation)
+                    item {
+                        Spacer(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        )
+                    }
+
+                    item {
+                        SearchBar()
+                    }
+                    item {
+                        MessageCategoryBar()
+                    }
+
+
+                    items(messages) { message ->
+                        MessageItem(
+                            senderProfilePicture = message.profile_picture,
+                            navigationViewModel = navigationViewModel,
+                            senderName = message.user_name,
+                            message = message.caption,
+                        )
+                    }
+
+                }
+                MessagesHeader(
+                    username = user.user_name,
+                    modifier = Modifier,
+                ) {
+                    onClick()
+                }
+            }
+        }
     }
 }
 
-@Composable
-fun dummy(a:String,b:String){}
 
 @Composable
 @Preview(showBackground = true)
 fun MessagesPreviewScreen(){
-    val appState = rememberAppState()
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         MessagesScreen(
-            appState::backNavigation,
-            appState::onNavigateToScreen
-        )
+            navigationViewModel = hiltViewModel(),
+            screenStackIndex = 0
+        ){}
     }
 }

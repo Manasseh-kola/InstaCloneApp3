@@ -5,12 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.mock_data.StoriesRepo
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationshipSearchBar
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 /*
 Search Screen
@@ -34,12 +31,12 @@ fun PhotoItem(image:Int){
         painter = painterResource(id = image),
         contentScale = ContentScale.Crop,
         contentDescription = "",
-        modifier = Modifier
-            .aspectRatio(1f)
+        modifier = Modifier.aspectRatio(1f)
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScreen() {
     val search = remember { mutableStateOf("") }
@@ -74,7 +71,7 @@ fun SearchScreen() {
 @Preview(showBackground = true)
 @Composable
 fun SearchScreenPreview() {
-    InstaCloneApp3Theme() {
+    InstaCloneApp3Theme {
         SearchScreen()
     }
 }

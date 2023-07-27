@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,14 +51,13 @@ import androidx.compose.ui.unit.sp
 import com.example.instacloneapp3.R
 import com.example.instacloneapp3.presentation.mock_data.Posts
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.rememberAppState
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.screens.story_screen.emojis
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.screens.story_screen.components.emojis
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 import kotlin.math.roundToInt
 
 @Composable
-fun CommentScreen(showModal: MutableState<Boolean>, hideModal: () -> Unit){
+fun CommentScreen(showModal: MutableState<Boolean>){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
@@ -85,7 +83,8 @@ fun CommentScreen(showModal: MutableState<Boolean>, hideModal: () -> Unit){
                             val xBreakPoint = 750.4563f
 
                             if (offsetX.value >= xBreakPoint) {
-                                hideModal()
+                                //Navigate back
+                                TODO()
                             } else if (offsetX.value != 0.0f) {
                                 offsetX.value = 0.0f
                             }
@@ -318,9 +317,8 @@ fun CommentScreenHeader(showModal: MutableState<Boolean>) {
 @Composable
 @Preview(showBackground = true)
 fun CommentScreenPreview(){
-    val appState = rememberAppState()
     InstaCloneApp3Theme {
-        CommentScreen(remember{mutableStateOf(false)}, appState::hideModal)
+        CommentScreen(remember{mutableStateOf(false)})
     }
 
 }

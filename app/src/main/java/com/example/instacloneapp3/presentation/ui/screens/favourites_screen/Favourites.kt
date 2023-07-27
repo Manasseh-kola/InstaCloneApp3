@@ -35,16 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 import kotlin.math.roundToInt
 
-
 @Composable
-fun FavouritesScreen(hideModal: ()->Unit){
+fun FavouritesScreen(){
     val posts = listOf<Int>()
-    var offsetX = remember { mutableStateOf(0f) }
-    var animatedOffsetX = animateFloatAsState(offsetX.value)
+    val offsetX = remember { mutableStateOf(0f) }
+    val animatedOffsetX = animateFloatAsState(offsetX.value)
     Column(
         modifier = Modifier
             .offset { IntOffset(animatedOffsetX.value.roundToInt(), 0) }
@@ -55,7 +53,8 @@ fun FavouritesScreen(hideModal: ()->Unit){
                     onDragEnd = {
                         val xBreakPoint = 750.4563f
                         if (offsetX.value >= xBreakPoint) {
-                            hideModal()
+                            //Navigate back
+                            TODO()
                         } else if (offsetX.value != 0.0f) {
                             offsetX.value = 0.0f
                         }
@@ -68,7 +67,7 @@ fun FavouritesScreen(hideModal: ()->Unit){
                 }
             }
     ){
-        FavouritesScreenHeader(modifier = Modifier){hideModal()}
+        FavouritesScreenHeader(modifier = Modifier){}
         Divider()
         if(posts.isEmpty()) ListNotCreated()
         else FavouritesList()
@@ -121,7 +120,7 @@ fun ListNotCreated() {
 
 @Composable
 fun FavouritesList() {
-    LazyColumn(){}
+    LazyColumn {}
 }
 
 @Composable
@@ -167,8 +166,7 @@ fun FavouritesScreenHeader(
 @Composable
 @Preview(showBackground = true)
 fun FavouritesScreenPreview(){
-    val appState = rememberAppState()
     InstaCloneApp3Theme {
-        FavouritesScreen(appState::hideModal)
+        FavouritesScreen()
     }
 }

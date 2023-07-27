@@ -21,6 +21,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,16 +38,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.instacloneapp3.presentation.ui.rememberAppState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.instacloneapp3.presentation.ui.core.components.HorizontalDraggableScreen
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class Screens{
-    object Followers: Screens()
-    object Following: Screens()
-    object Subscriptions: Screens()
+sealed class Screens(val name: String){
+    object Followers: Screens("Followers")
+    object Following: Screens("Following")
+    object Subscriptions: Screens("subscriptions")
 }
 
 val screens = listOf(
@@ -68,9 +71,9 @@ fun RelationShipSelector(width: Float, height: Dp, color: Color, modifier: Modif
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RelationshipHeader(
-    backNavigation: (String, String) -> Unit,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
+    navigationViewModel: NavigationViewModel,
 ){
 
     val page0Color =  animateColorAsState(
@@ -104,11 +107,14 @@ fun RelationshipHeader(
                 contentDescription = "",
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable(onClick = { backNavigation("profile", "profile") })
+                    .clickable {
+                        //Navigate back
+                        navigationViewModel.popBackStack()
+                    }
 
             )
             Text(
-                text = "${user.user_name}",
+                text = user.user_name,
                 fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center)
@@ -121,6 +127,8 @@ fun RelationshipHeader(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
         ){
+
+
             Text(
                 color = page0Color.value,
                 fontWeight = FontWeight(500),
@@ -146,8 +154,9 @@ fun RelationshipHeader(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RelationShipScreen(
-    backNavigation: (String, String) -> Unit,
-    currentPage: String?
+    currentPage: String?,
+    navigationViewModel: NavigationViewModel,
+    screenStackIndex: Int,
 ){
     val page = currentPage?.toFloat() ?: 0.00f
     val configuration = LocalConfiguration.current
@@ -155,6 +164,7 @@ fun RelationShipScreen(
     val pagerState = rememberPagerState()
     val xOffset = remember { mutableStateOf(page)}
     val animatedXOffset = animateFloatAsState(targetValue = xOffset.value)
+
     // scroll to page
     val coroutineScope = rememberCoroutineScope()
 
@@ -165,55 +175,65 @@ fun RelationShipScreen(
         }
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    // X Offset for Draggable Screen
+    HorizontalDraggableScreen(
+        screenStackIndex = screenStackIndex,
+        navigationViewModel = navigationViewModel
     ){
-        RelationshipHeader(backNavigation, pagerState, coroutineScope)
-        Box(
-            modifier = Modifier.padding(top = 15.dp, bottom = 5.dp)
-        ) {
+        Surface(shadowElevation = 10.dp){
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .fillMaxSize(),
 
-            RelationShipSelector(1f, 0.5.dp , Color.Gray, Modifier)
-            RelationShipSelector((1.0f/3.0f), 1.dp , Color.Black,
-                Modifier
-                    .offset(x = screenWidth * animatedXOffset.value / 3)
-                    .align(Alignment.CenterStart)
-            )
-        }
+                ) {
+                RelationshipHeader(
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    navigationViewModel = navigationViewModel
+                )
+                Box(
+                    modifier = Modifier.padding(top = 15.dp, bottom = 5.dp)
+                ) {
 
-
-        HorizontalPager(
-            pageCount = screens.size,
-            state = pagerState
-        ) {page ->
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    xOffset.value = pagerState.startOffsetForPage(page)
+                    RelationShipSelector(1f, 0.5.dp, Color.Gray, Modifier)
+                    RelationShipSelector(
+                        (1.0f / 3.0f), 1.dp, Color.Black,
+                        Modifier
+                            .offset(x = screenWidth * animatedXOffset.value / 3)
+                            .align(Alignment.CenterStart)
+                    )
                 }
-            ){
-                when (screens[page]) {
-                    Screens.Followers -> FollowersScreen(
-                        backNavigation = backNavigation,
-                        modifier = Modifier
-                    )
 
-                    Screens.Following -> FollowingScreen(
-                        backNavigation = backNavigation,
-                        modifier = Modifier
-                    )
 
-                    Screens.Subscriptions -> SubscribeScreen(
-                        backNavigation = backNavigation,
-                        modifier = Modifier
-                    )
+                HorizontalPager(
+                    pageCount = screens.size,
+                    state = pagerState
+                ) { page ->
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            xOffset.value = pagerState.startOffsetForPage(page)
+                        }
+                    ) {
+                        when (screens[page]) {
+                            Screens.Followers -> FollowersScreen(
+                                modifier = Modifier
+                            )
+
+                            Screens.Following -> FollowingScreen(
+                                modifier = Modifier,
+                            )
+
+                            Screens.Subscriptions -> SubscribeScreen(
+                                modifier = Modifier,
+                            )
+                        }
+                    }
                 }
             }
         }
-
     }
 
 }
@@ -224,12 +244,12 @@ fun RelationShipScreen(
 fun PagerState.offsetForPage(page: Int) = currentPage + currentPageOffsetFraction
 
 
-
 // extension method for current page offset
 @OptIn(ExperimentalFoundationApi::class)
 fun PagerState.calculateCurrentOffsetForPage(page: Int): Float {
     return (currentPage - page) + currentPageOffsetFraction
 }
+
 // OFFSET ONLY FROM THE LEFT
 @OptIn(ExperimentalFoundationApi::class)
 fun PagerState.startOffsetForPage(page: Int): Float {
@@ -245,8 +265,11 @@ fun PagerState.endOffsetForPage(page: Int): Float {
 @Composable
 @Preview(showBackground = true)
 fun RelationshipScreenPreview(){
-    val appstate = rememberAppState()
     InstaCloneApp3Theme {
-        RelationShipScreen(appstate::backNavigation, "0")
+        RelationShipScreen(
+            currentPage = "0",
+            navigationViewModel = hiltViewModel(),
+            screenStackIndex = 0
+        )
     }
 }

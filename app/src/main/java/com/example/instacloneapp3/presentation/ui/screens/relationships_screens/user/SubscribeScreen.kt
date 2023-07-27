@@ -15,14 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.instacloneapp3.presentation.mock_data.PostsRepo
-import com.example.instacloneapp3.presentation.ui.rememberAppState
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 @Composable
 fun SubscribeScreen(
-    backNavigation: (String, String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ){
     val subscribeList = PostsRepo().getPosts()
     Column(
@@ -30,7 +27,7 @@ fun SubscribeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
-        LazyColumn(){
+        LazyColumn {
             item{
                 Text(
                     "Subscribe to creators you follow",
@@ -72,12 +69,13 @@ fun SubscribeScreen(
 @Composable
 @Preview(showBackground = true)
 fun SubscribeScreenPreview(){
-    val appsate = rememberAppState()
     InstaCloneApp3Theme {
         LazyRow()
         {
             item{
-                SubscribeScreen(appsate::backNavigation, Modifier.fillParentMaxSize())
+                SubscribeScreen(
+                    modifier = Modifier.fillParentMaxSize(),
+                )
             }
         }
     }

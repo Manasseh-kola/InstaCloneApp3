@@ -30,26 +30,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.instacloneapp3.presentation.ui.rememberAppState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.instacloneapp3.presentation.ui.core.AppScreenTypes
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.storyImageModifier
 import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
-
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.view_models.NavigationViewModel
 
 /*
 User Profile info section
  */
 
+
+
 @Composable
 fun ProfileInfo(
-    amount:String,
-    info:String,
-    navigateToRoute: (String) -> Unit,
-    destination:String,
-    userIndex: Int = 0
-){
+    amount: String,
+    info: String,
+    currentPage: String?,
+    navigationViewModel: NavigationViewModel,
+
+    ){
     //Current page in Relationship screens
-    val currentPage = if(info == "Followers") "1" else "2"
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -60,7 +63,11 @@ fun ProfileInfo(
                 - page 1 = Followers screen
                 - page 2 = Following screen
                  */
-                navigateToRoute("$destination/$currentPage*$userIndex")
+                if(currentPage != null) {
+                    navigationViewModel.pushToBackStack(
+                        AppScreenTypes.UserRelationShip(args = currentPage)
+                    )
+                }
             }
     ) {
         //Number of Relationship/PostsInfo category
@@ -75,7 +82,7 @@ fun ProfileInfo(
 }
 
 @Composable
-fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
+fun ProfileInfoTab(navigationViewModel: NavigationViewModel) {
 
     Column(
         modifier = Modifier
@@ -133,13 +140,28 @@ fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
                     .padding(5.dp)
             ) {
                 //Number of Posts
-                ProfileInfo("7", "Posts",navigateToRoute,"")
+                ProfileInfo(
+                    amount = "7",
+                    info = "Posts",
+                    currentPage = null,
+                    navigationViewModel = navigationViewModel
+                )
 
                 //Number of Followers
-                ProfileInfo(user.followers_count.toString(), "Followers",navigateToRoute,"relationship")
+                ProfileInfo(
+                    navigationViewModel = navigationViewModel,
+                    amount = user.followers_count.toString(),
+                    info = "Followers",
+                    currentPage = "0",
+                )
 
                 //Number of User Following
-                ProfileInfo(user.following_count.toString(), "Following",navigateToRoute,"relationship")
+                ProfileInfo(
+                    navigationViewModel = navigationViewModel,
+                    amount = user.following_count.toString(),
+                    info = "Following",
+                    currentPage = "1",
+                )
             }
 
         }
@@ -199,10 +221,7 @@ fun ProfileInfoTab(navigateToRoute: (String) -> Unit){
 @Composable
 @Preview(showBackground = true)
 fun ProfileInfoPreview(){
-    val appState = rememberAppState()
     InstaCloneApp3Theme {
-        ProfileInfoTab(
-            navigateToRoute = appState::onNavigateToScreen
-        )
+        ProfileInfoTab(navigationViewModel =  hiltViewModel())
     }
 }

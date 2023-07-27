@@ -35,7 +35,7 @@ import com.example.instacloneapp3.presentation.ui.screens.home_screen.user
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.FollowingButton
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.FollowingItem
 import com.example.instacloneapp3.presentation.ui.screens.relationships_screens.user.RelationshipSearchBar
-import com.example.instacloneapp3.presentation.ui.theme.InstaCloneApp3Theme
+import com.example.instacloneapp3.presentation.ui.core.theme.InstaCloneApp3Theme
 
 
 
